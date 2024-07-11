@@ -5,14 +5,15 @@ import com.click.account.domain.entity.Account;
 import java.util.UUID;
 
 public record AccountRequest(
-        String account,
         String accountPassword,
         String accountName
 ) {
     public Account toEntity(
+            String account,
             UUID userId,
             Long accountDailyLimit,
-            Long accountOneTimeLimit
+            Long accountOneTimeLimit,
+            boolean accountDisable
     ) {
         return Account.builder()
                 .account(account)
@@ -21,7 +22,7 @@ public record AccountRequest(
                 .accountName(accountName)
                 .accountDailyLimit(accountDailyLimit)
                 .accountOneTimeLimit(accountOneTimeLimit)
-                .accountDisable(true)
+                .accountDisable(accountDisable)
                 .build();
     }
 }
