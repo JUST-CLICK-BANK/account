@@ -43,4 +43,6 @@ public class Account {
     @Column(name = "ACCOUNT_DISABLE")
     @Setter
     private Boolean accountDisable;
+
+//    public static voi
 }

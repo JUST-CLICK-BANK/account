@@ -3,6 +3,7 @@ package com.click.account.service;
 import com.click.account.config.constants.TransferLimit;
 import com.click.account.config.utils.GenerateAccount;
 import com.click.account.config.utils.GroupCode;
+import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dto.request.AccountRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
@@ -10,12 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
+    private final AccountDao accountDao;
     private final AccountRepository accountRepository;
 
 
@@ -24,25 +25,12 @@ public class AccountServiceImpl implements AccountService {
         String account = GenerateAccount.generateAccount();
 
         // 중복된 계좌가 있는지 확인 필요
-        accountRepository.findByAccount(account)
-                .filter(byAccount -> byAccount.getAccount().equals(account))
-                .ifPresent(byAccount -> {
-                    throw new IllegalArgumentException("이미 있는 계좌입니다.");
-                });
+        accountDao.compareAccount(account);
 
         if (req.status().equals("account"))
-            accountRepository.save(req.toEntity(GenerateAccount.generateAccount(), userId, TransferLimit.getDailyLimit(), TransferLimit.getOnetimeLimit(), true));
+            accountDao.saveAccount(req, account, userId);
         if (req.status().equals("group"))
-            accountRepository.save(
-                    req.toGroupEntity(
-                        account,
-                        userId,
-                        TransferLimit.getDailyLimit(),
-                        TransferLimit.getOnetimeLimit(),
-                        GroupCode.getGroupCode(),
-                        true
-                    )
-            );
+            accountDao.saveGroupAccount(req, account, userId);
     }
 
     @Override
@@ -50,15 +38,6 @@ public class AccountServiceImpl implements AccountService {
     public void deleteAccount(UUID userId, String account) {
         Account delete = accountRepository.findByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
         delete.setAccountDisable(false);
-    }
-
-
-    @Override
-    @Transactional
-    public void deleteGroupAccount(UUID userId, String account) {
-        Account delete = accountRepository.findByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
-        delete.setAccountDisable(true);
-
     }
 }
 
