@@ -24,8 +24,11 @@ public class AccountServiceImpl implements AccountService {
         String account = GenerateAccount.generateAccount();
 
         // 중복된 계좌가 있는지 확인 필요
-        Account byAccount = accountRepository.findByAccount(account).orElseThrow(IllegalArgumentException::new);
-        if (byAccount.getAccount().equals(account)) throw new IllegalArgumentException();
+        accountRepository.findByAccount(account)
+                .filter(byAccount -> byAccount.getAccount().equals(account))
+                .ifPresent(byAccount -> {
+                    throw new IllegalArgumentException("이미 있는 계좌입니다.");
+                });
 
         if (req.status().equals("account"))
             accountRepository.save(req.toEntity(GenerateAccount.generateAccount(), userId, TransferLimit.getDailyLimit(), TransferLimit.getOnetimeLimit(), true));

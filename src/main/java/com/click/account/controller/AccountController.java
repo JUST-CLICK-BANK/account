@@ -3,10 +3,7 @@ package com.click.account.controller;
 import com.click.account.domain.dto.request.AccountRequest;
 import com.click.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -19,5 +16,6 @@ public class AccountController {
     @PostMapping()
     public void saveAccount(@RequestBody AccountRequest req) {
         accountService.saveAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
-    }
+}
+
 }
