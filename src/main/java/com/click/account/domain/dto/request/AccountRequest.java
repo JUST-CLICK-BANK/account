@@ -10,10 +10,11 @@ public record AccountRequest(
         String accountName
 ) {
     public Account toEntity(
+            String account,
             UUID userId,
             Long accountDailyLimit,
-            Long accountOneTimeLimit
-
+            Long accountOneTimeLimit,
+            boolean accountDisable
     ) {
         return Account.builder()
                 .account(account)
@@ -22,7 +23,7 @@ public record AccountRequest(
                 .accountName(accountName)
                 .accountDailyLimit(accountDailyLimit)
                 .accountOneTimeLimit(accountOneTimeLimit)
-                .accountDisable(true)
+                .accountDisable(accountDisable)
                 .build();
     }
 }
