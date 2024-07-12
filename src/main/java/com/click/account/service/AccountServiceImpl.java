@@ -2,11 +2,14 @@ package com.click.account.service;
 
 import com.click.account.config.constants.TransferLimit;
 import com.click.account.config.utils.GenerateAccount;
+import com.click.account.config.utils.GroupCode;
 import com.click.account.domain.dto.request.AccountRequest;
+import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,9 +20,25 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void saveAccount(UUID userId, AccountRequest req) {
-        if (req == null) throw new IllegalArgumentException();
+        String account = GenerateAccount.generateAccount();
+
         // 중복된 계좌가 있는지 확인 필요
-        accountRepository.save(req.toEntity(GenerateAccount.generateAccount(), userId, TransferLimit.getDailyLimit(), TransferLimit.getOnetimeLimit(), true));
+        Account byAccount = accountRepository.findByAccount(account).orElseThrow(IllegalArgumentException::new);
+        if (byAccount.getAccount().equals(account)) throw new IllegalArgumentException();
+
+        if (req.status().equals("account"))
+            accountRepository.save(req.toEntity(GenerateAccount.generateAccount(), userId, TransferLimit.getDailyLimit(), TransferLimit.getOnetimeLimit(), true));
+        if (req.status().equals("group"))
+            accountRepository.save(
+                    req.toGroupEntity(
+                        account,
+                        userId,
+                        TransferLimit.getDailyLimit(),
+                        TransferLimit.getOnetimeLimit(),
+                        GroupCode.getGroupCode(),
+                        true
+                    )
+            );
     }
 
 }
