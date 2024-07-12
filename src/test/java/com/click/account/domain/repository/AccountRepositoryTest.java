@@ -25,6 +25,7 @@ class AccountRepositoryTest {
         Long dailyLimit = 1000000L;
         Long onetimeLimit = 1000000L;
         AccountRequest request = new AccountRequest(
+                "account",
                 "0123",
                 "텅장"
         );
@@ -42,6 +43,7 @@ class AccountRepositoryTest {
         Long dailyLimit = 1000000L;
         Long onetimeLimit = 1000000L;
         AccountRequest request = new AccountRequest(
+                "account",
                 "0123",
                 "텅장"
         );

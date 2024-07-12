@@ -4,6 +4,7 @@ import com.click.account.domain.dto.request.AccountRequest;
 import com.click.account.service.AccountService;
 import feign.Param;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -15,12 +16,13 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public void saveAccount(@RequestBody AccountRequest req) {
         accountService.saveAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
+  
     @DeleteMapping()
     public void deleteAccount(@Param("account") String account) {
         accountService.deleteAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), account);
     }
-
 }
