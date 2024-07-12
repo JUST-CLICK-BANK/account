@@ -5,6 +5,7 @@ import com.click.account.domain.entity.Account;
 import java.util.UUID;
 
 public record AccountRequest(
+        String account,
         String accountPassword,
         String accountName
 ) {
