@@ -24,12 +24,6 @@ public class AccountServiceimpl implements AccountService {
     }
 
     @Override
-    public void saveGroupAccount(UUID userId, GroupAccountRequest req) {
-        if (req == null) throw new IllegalArgumentException();
-        accountRepository.save(req.toEntity(userId, TransferLimit.getDailyLimit(), TransferLimit.getOnetimeLimit(), ))
-    }
-
-    @Override
     @Transactional
     public void deleteAccount(UUID userId, String account) {
         Account delete = accountRepository.findByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
