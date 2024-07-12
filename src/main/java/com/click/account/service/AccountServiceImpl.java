@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -44,7 +45,10 @@ public class AccountServiceImpl implements AccountService {
                     )
             );
     }
-
+//@Override
+//public List<Account> getByUserId(UUID userId){
+//        return accountRepository.findByUserId(userId);
+//}
     @Override
     @Transactional
     public void deleteAccount(UUID userId, String account) {
@@ -53,12 +57,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-    @Override
-    @Transactional
-    public void deleteGroupAccount(UUID userId, String account) {
-        Account delete = accountRepository.findByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
-        delete.setAccountDisable(true);
 
-    }
 }
 

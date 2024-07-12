@@ -7,6 +7,6 @@ import java.util.UUID;
 public interface AccountService {
     void saveAccount(UUID userId, AccountRequest req);
     void deleteAccount(UUID userId,String account);
-    void deleteGroupAccount(UUID userId,String account);
+
 
 }
