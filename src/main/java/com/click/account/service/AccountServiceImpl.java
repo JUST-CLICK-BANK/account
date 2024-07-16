@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,10 +58,28 @@ public class AccountServiceImpl implements AccountService {
         accountDao.updateAccountLimit(userId, req);
     }
 
+
+    public List<Account> findByUserId(UUID userId) {
+        return accountRepository.findByUserId(userId);
+    }
+    @Override
+    public List<Account> findDisabledAccountByUserId(UUID userId) {
+        return accountRepository.findByUserIdAndAccountDisable(userId, true);
+    }
+
+    @Override
+    public List<String> findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
+        return accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true)
+                .stream()
+                .map(Account::getGroupAccountCode)
+                .collect(Collectors.toList());
+
+    }
+
     @Override
     @Transactional
     public void deleteAccount(UUID userId, String account) {
-        Account delete = accountRepository.findByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
+        Account delete = accountRepository.findOptionalByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
         delete.setAccountDisable(false);
     }
 }
