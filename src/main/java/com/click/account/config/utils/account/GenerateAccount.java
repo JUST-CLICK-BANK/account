@@ -1,4 +1,4 @@
-package com.click.account.config.utils;
+package com.click.account.config.utils.account;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;

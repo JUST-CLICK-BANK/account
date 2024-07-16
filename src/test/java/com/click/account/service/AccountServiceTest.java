@@ -1,6 +1,6 @@
 package com.click.account.service;
 
-import com.click.account.config.utils.GenerateAccount;
+import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dto.request.AccountRequest;
 import com.click.account.domain.entity.Account;
@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;

@@ -44,5 +44,20 @@ public class Account {
     @Setter
     private Boolean accountDisable;
 
-//    public static voi
+    public void updateName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void updateMoney(Long moneyAmount) {
+        this.moneyAmount = moneyAmount;
+    }
+
+    public void updatePassword(String accountPassword) {
+        this.accountPassword = accountPassword;
+    }
+
+    public void updateTransferLimit(Long accountDailyLimit, Long accountOneTimeLimit) {
+        this.accountDailyLimit = accountDailyLimit;
+        this.accountOneTimeLimit = accountOneTimeLimit;
+    }
 }
