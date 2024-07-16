@@ -1,11 +1,7 @@
-package com.click.account.config.utils;
+package com.click.account.config.utils.account;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 @Component
 public class GroupCode {
