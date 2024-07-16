@@ -56,7 +56,6 @@ public class AccountController {
             throw new IllegalArgumentException(" 그룹 코드를 찾을 수 없습니다.");
         }
         return groupCodes;
-
     }
 
 }
