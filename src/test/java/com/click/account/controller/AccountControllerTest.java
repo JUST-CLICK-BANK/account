@@ -45,6 +45,7 @@ class AccountControllerTest {
         // given
         UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
         AccountRequest request = new AccountRequest(
+                "account",
                 "0123",
                 "텅장"
         );
@@ -72,10 +73,11 @@ class AccountControllerTest {
     }
 
     @Test
-    void 계좌_실패() throws Exception {
+    void 계좌_생성_실패() throws Exception {
         // given
         UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
         AccountRequest request = new AccountRequest(
+                "account",
                 "0123",
                 "텅장"
         );

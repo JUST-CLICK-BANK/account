@@ -6,6 +6,7 @@ import com.click.account.domain.entity.Account;
 import com.click.account.service.AccountService;
 import feign.Param;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +21,16 @@ public class AccountController {
     private static final UUID HARDCODED_USER_ID = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
 
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public void saveAccount(@RequestBody AccountRequest req) {
         accountService.saveAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
+  
     @DeleteMapping()
     public void deleteAccount(@Param("account") String account) {
         accountService.deleteAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), account);
     }
+
 
 //@GetMapping()
 //public List<Account> getByUserId(@Param UUID userId) {
@@ -56,3 +60,5 @@ public class AccountController {
     }
 
 }
+
+

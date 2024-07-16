@@ -10,7 +10,9 @@ import java.util.UUID;
 public interface AccountService {
     void saveAccount(UUID userId, AccountRequest req);
     void deleteAccount(UUID userId,String account);
+
     List<Account> findByUserId(UUID userId);
     List<Account> findDisabledAccountByUserId(UUID userId);
     List<String> findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
+
 }
