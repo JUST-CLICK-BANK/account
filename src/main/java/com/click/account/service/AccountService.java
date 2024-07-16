@@ -1,6 +1,7 @@
 package com.click.account.service;
 
 import com.click.account.domain.dto.request.*;
+import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.entity.Account;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface AccountService {
     void deleteAccount(UUID userId,String account);
 
     List<Account> findByUserId(UUID userId);
-    List<Account> findDisabledAccountByUserId(UUID userId);
+    List<AccountResponse> findDisabledAccountByUserId(UUID userId);
     List<String> findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
 
 }
