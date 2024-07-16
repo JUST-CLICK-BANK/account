@@ -3,6 +3,7 @@ package com.click.account.service;
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dto.request.*;
+import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -64,8 +65,11 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findByUserId(userId);
     }
     @Override
-    public List<Account> findDisabledAccountByUserId(UUID userId) {
-        return accountRepository.findByUserIdAndAccountDisable(userId, true);
+    public List<AccountResponse> findDisabledAccountByUserId(UUID userId) {
+        return accountRepository.findByUserIdAndAccountDisable(userId, true)
+                .stream()
+                .map(AccountResponse::from)
+                .collect(Collectors.toList());
     }
 
     @Override

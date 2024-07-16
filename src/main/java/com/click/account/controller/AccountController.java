@@ -92,28 +92,21 @@ public class AccountController {
 //        accountService.deleteAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), account);
     }
 
-
-//@GetMapping()
-//public List<Account> getByUserId(@Param UUID userId) {
-//    // HARDCODED_USER_ID를 사용하여 실제로는 userId 파라미터를 무시합니다.
-//    UUID hardcodedUserId = U/UID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
-//    return accountService.findByUserId(hardcodedUserId);
-////            .orElseThrow(() -> new IllegalArgumentException("계좌를 찾을 수 없습니다."));
-//}
-
     @GetMapping("disable")
-    public List<Account> getDisabledAccountByUserId(@RequestHeader UUID userId) {
-        UUID hardcodedUserId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
-        List<Account> disabledAccounts = accountService.findDisabledAccountByUserId(hardcodedUserId);
+    public List<AccountResponse> getDisabledAccountByUserId(@RequestHeader ("Authorization") String bearerToken) {
+        String token = bearerToken.substring(7);
+        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+        List<AccountResponse> disabledAccounts = accountService.findDisabledAccountByUserId(UUID.fromString(tokenInfo.id()));
         if (disabledAccounts.isEmpty()) {
             throw new IllegalArgumentException("비활성화된 계좌를 찾을 수 없습니다.");
         }
         return disabledAccounts;
     }
     @GetMapping("group")
-    public List<String> getGroupAccountCodeByUserIdAndAccount(@RequestHeader UUID userId, @RequestParam("account") String account) {
-        UUID hardcodedUserId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
-        List<String> groupCodes = accountService.findGroupAccountCodeByUserIdAndAccount(HARDCODED_USER_ID, account);
+    public List<String> getGroupAccountCodeByUserIdAndAccount(@RequestHeader ("Authorization") String bearerToken, @RequestParam("account") String account) {
+        String token = bearerToken.substring(7);
+        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+        List<String> groupCodes = accountService.findGroupAccountCodeByUserIdAndAccount(UUID.fromString(tokenInfo.id()), account);
         if (groupCodes.isEmpty()) {
             throw new IllegalArgumentException(" 그룹 코드를 찾을 수 없습니다.");
         }
