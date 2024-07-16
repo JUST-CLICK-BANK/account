@@ -9,6 +9,10 @@ import java.util.UUID;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByAccount(String account);
-    Optional<Account>  findByUserIdAndAccount (UUID userId, String account);
-    Optional<Account> findByUserId(UUID userId);
+    Optional<Account>  findOptionalByUserIdAndAccount (UUID userId, String account);
+    List<Account> findByUserId(UUID userId);
+    List<Account> findByUserIdAndAccountDisable(UUID userId, Boolean accountDisable);
+//    List<Account> findByUserIdAndGroupAccountCodeAndAccount(UUID userId, String groupAccountCode,String account);
+//    List<Account> findAll(UUID userId);
+    List<Account> findByUserIdAndAccountAndAccountDisable(UUID userId, String account, Boolean accountDisable);
 }
