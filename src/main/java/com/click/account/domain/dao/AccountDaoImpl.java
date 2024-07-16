@@ -26,6 +26,7 @@ public class AccountDaoImpl implements AccountDao {
 
     @Override
     public void saveAccount(AccountRequest req, String account, UUID userId) {
+
         accountRepository.save(
                 req.toEntity(
                         account,
@@ -53,7 +54,7 @@ public class AccountDaoImpl implements AccountDao {
 
     @Override
     public Account getAccount(UUID userId, String generatedAccount) {
-        return accountRepository.findByUserIdAndAccount(userId, generatedAccount).orElseThrow(IllegalArgumentException::new);
+        return accountRepository.findOptionalByUserIdAndAccount(userId, generatedAccount).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override

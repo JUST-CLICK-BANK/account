@@ -5,7 +5,7 @@ import io.jsonwebtoken.Claims;
 import java.util.UUID;
 
 public record TokenInfo(
-        UUID id,
+        String id,
         String code,
         String img,
         String name,
@@ -13,7 +13,7 @@ public record TokenInfo(
 ) {
     static public TokenInfo from(Claims claims) {
         return new TokenInfo(
-                claims.get("id", UUID.class),
+                claims.get("id", String.class),
                 claims.get("code", String.class),
                 claims.get("img", String.class),
                 claims.get("name", String.class),

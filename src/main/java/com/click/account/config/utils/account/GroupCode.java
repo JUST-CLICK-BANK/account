@@ -7,6 +7,19 @@ import org.springframework.stereotype.Component;
 public class GroupCode {
 
     public static String getGroupCode() {
-        return RandomStringUtils.random(6, true, true);
+        String groupCode;
+        do {
+            groupCode = RandomStringUtils.random(6, true, true).toUpperCase();
+        } while (!isNumber(groupCode));
+        return groupCode;
+    }
+
+    private static Boolean isNumber(String groupCode) {
+        for(char c : groupCode.toCharArray()) {
+            if (Character.isDigit(c)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
