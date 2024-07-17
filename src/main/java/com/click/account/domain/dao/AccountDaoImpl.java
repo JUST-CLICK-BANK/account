@@ -1,6 +1,7 @@
 package com.click.account.domain.dao;
 
 import com.click.account.config.constants.TransferLimit;
+import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.account.GroupCode;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.entity.Account;
@@ -16,17 +17,14 @@ public class AccountDaoImpl implements AccountDao {
     private final AccountRepository accountRepository;
 
     @Override
-    public void compareAccount(String generatedAccount) {
-        accountRepository.findByAccount(generatedAccount)
+    public boolean compareAccount(String generatedAccount) {
+        return accountRepository.findByAccount(generatedAccount)
                 .filter(byAccount -> byAccount.getAccount().equals(generatedAccount))
-                .ifPresent(byAccount -> {
-                    throw new IllegalArgumentException("이미 있는 계좌입니다.");
-                });
+                .isPresent();
     }
 
     @Override
     public void saveAccount(AccountRequest req, String account, UUID userId) {
-
         accountRepository.save(
                 req.toEntity(
                         account,

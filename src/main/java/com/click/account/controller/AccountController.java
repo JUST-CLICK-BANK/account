@@ -30,10 +30,8 @@ public class AccountController {
             @RequestBody AccountRequest req
     ) {
         String token = bearerToken.substring(7);
-        System.out.println(token);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        System.out.println(tokenInfo.id());
-        accountService.saveAccount(UUID.fromString(tokenInfo.id()), req);
+        accountService.saveAccount(tokenInfo, req);
 //        accountService.saveAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
 

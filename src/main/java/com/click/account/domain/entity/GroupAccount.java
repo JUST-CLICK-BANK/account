@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ValueGenerationType;
 
 import java.util.UUID;
 
@@ -15,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Table(name = "GROUP_ACCOUNT_LISTS")
-public class GroupAccountList {
+public class GroupAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FRIEND_ID")
@@ -33,7 +32,6 @@ public class GroupAccountList {
     @Column(name = "USER_ID")
     private UUID userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account", nullable = false)
-    private Account account;
+    @Column(name = "ACCOUNT")
+    private String account;
 }

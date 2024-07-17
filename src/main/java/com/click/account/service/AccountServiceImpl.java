@@ -1,7 +1,9 @@
 package com.click.account.service;
 
 import com.click.account.config.utils.account.GenerateAccount;
+import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
+import com.click.account.domain.dao.GroupAccountDao;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
@@ -17,19 +19,28 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
     private final AccountDao accountDao;
+    private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
 
     @Override
-    public void saveAccount(UUID userId, AccountRequest req) {
-        String account = GenerateAccount.generateAccount();
+    public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
+        String account;
+        UUID userId = UUID.fromString(tokenInfo.id());
 
-        // 중복된 계좌가 있는지 확인 필요
-        accountDao.compareAccount(account);
+        // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
+        do {
+            account = GenerateAccount.generateAccount();
+        } while(accountDao.compareAccount(account));
 
+        // 일반 계좌 생성
         if (req.status().equals("account"))
             accountDao.saveAccount(req, account, userId);
-        if (req.status().equals("group"))
+
+        // 모임 통장 계좌 생성
+        if (req.status().equals("group")) {
             accountDao.saveGroupAccount(req, account, userId);
+            groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
+        }
     }
 
     @Override
@@ -48,6 +59,7 @@ public class AccountServiceImpl implements AccountService {
             Long money = accountDao.getAccount(userId, req.account()).getMoneyAmount() + req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
         }
+        // 돈이 0원일때 예외 처리 필요
         if (req.status().equals("transfer")) {
             Long money = accountDao.getAccount(userId, req.account()).getMoneyAmount() - req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
@@ -74,7 +86,6 @@ public class AccountServiceImpl implements AccountService {
                 .stream()
                 .map(Account::getGroupAccountCode)
                 .collect(Collectors.toList());
-
     }
 
     @Override

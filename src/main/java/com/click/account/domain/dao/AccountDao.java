@@ -6,7 +6,7 @@ import com.click.account.domain.entity.Account;
 import java.util.UUID;
 
 public interface AccountDao {
-    void compareAccount(String generatedAccount);
+    boolean compareAccount(String generatedAccount);
     void saveAccount(AccountRequest req, String account, UUID userId);
     void saveGroupAccount(AccountRequest req, String account, UUID userId);
     Account getAccount(UUID userId, String Account);
