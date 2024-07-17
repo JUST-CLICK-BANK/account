@@ -24,14 +24,11 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
-        String account;
+
         UUID userId = UUID.fromString(tokenInfo.id());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
-        do {
-            account = GenerateAccount.generateAccount();
-        } while(accountDao.compareAccount(account));
-
+        String account =  makeAccount();
         // 일반 계좌 생성
         if (req.status().equals("account"))
             accountDao.saveAccount(req, account, userId);
@@ -41,6 +38,12 @@ public class AccountServiceImpl implements AccountService {
             accountDao.saveGroupAccount(req, account, userId);
             groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
         }
+    }
+
+    private String makeAccount() {
+        String account = GenerateAccount.generateAccount();
+        if(accountDao.compareAccount(account)) return makeAccount();
+        return account;
     }
 
     @Override

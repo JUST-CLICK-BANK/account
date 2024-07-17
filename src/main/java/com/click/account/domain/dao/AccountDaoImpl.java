@@ -19,7 +19,6 @@ public class AccountDaoImpl implements AccountDao {
     @Override
     public boolean compareAccount(String generatedAccount) {
         return accountRepository.findByAccount(generatedAccount)
-                .filter(byAccount -> byAccount.getAccount().equals(generatedAccount))
                 .isPresent();
     }
 
