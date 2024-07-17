@@ -2,6 +2,7 @@ package com.click.account.service;
 
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.domain.dao.AccountDao;
+import com.click.account.domain.dao.GroupAccountDao;
 import com.click.account.domain.dto.request.AccountRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
@@ -25,6 +26,9 @@ class AccountServiceTest {
     private AccountDao accountDao;
 
     @Mock
+    private GroupAccountDao groupAccountDao;
+
+    @Mock
     private AccountRepository accountRepository;
 
     @InjectMocks
@@ -32,7 +36,7 @@ class AccountServiceTest {
 
     @BeforeEach
     public void setUpTest() {
-        accountService = new AccountServiceImpl(accountDao, accountRepository);
+        accountService = new AccountServiceImpl(accountDao, groupAccountDao, accountRepository);
     }
 
     @Test
