@@ -33,7 +33,7 @@ public class GroupAccountList {
     @Column(name = "USER_ID")
     private UUID userId;
 
-    @ManyToOne(targetEntity = Account.class, fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "account")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account", nullable = false)
     private Account account;
 }
