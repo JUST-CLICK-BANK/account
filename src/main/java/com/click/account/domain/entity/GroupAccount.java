@@ -15,6 +15,7 @@ import java.util.UUID;
 @Builder
 @Table(name = "GROUP_ACCOUNT_LISTS")
 public class GroupAccount {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FRIEND_ID")

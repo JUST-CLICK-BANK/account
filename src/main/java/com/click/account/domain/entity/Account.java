@@ -3,8 +3,6 @@ package com.click.account.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,8 +16,12 @@ public class Account {
     @Column(name = "ACCOUNT")
     private String account;
 
-    @Column(name = "USER_ID")
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
+
+//    @Column(name = "USER_ID")
+//    private UUID userId;
 
     @Column(name = "ACCOUNT_PASSWORD")
     private String accountPassword;
