@@ -1,6 +1,9 @@
 package com.click.account.domain.dao;
 
+import com.click.account.domain.dto.request.AccountNameRequest;
+import com.click.account.domain.dto.request.AccountPasswordRequest;
 import com.click.account.domain.dto.request.AccountRequest;
+import com.click.account.domain.dto.request.AccountTransferLimitRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
 import org.junit.jupiter.api.Assertions;
@@ -16,8 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountDaoTest {
@@ -36,7 +38,8 @@ class AccountDaoTest {
 
         when(existingAccount.getAccount()).thenReturn(generatedAccount);
 
-        when(accountRepository.findByAccount(generatedAccount)).thenReturn(Optional.of(existingAccount));
+        when(accountRepository.findByAccount(generatedAccount)).thenReturn(
+            Optional.of(existingAccount));
 
         // when + then
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -62,9 +65,9 @@ class AccountDaoTest {
         // given
         UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
         AccountRequest request = new AccountRequest(
-                "account",
-                "0123",
-                "텅장"
+            "account",
+            "0123",
+            "텅장"
         );
         String account = "111222333333";
 
@@ -80,18 +83,21 @@ class AccountDaoTest {
         // given
         UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
         AccountRequest request = new AccountRequest(
-                "account",
-                "0123",
-                "텅장"
+            "account",
+            "0123",
+            "텅장"
         );
         String account = "111222333333";
 
-        Mockito.doThrow(new RuntimeException("Database error")).when(accountRepository).save(any(Account.class));
+        Mockito.doThrow(new RuntimeException("Database error"))
+            .when(accountRepository).save(any(Account.class));
 
-        // when + then
-        RuntimeException thrown = Assertions.assertThrows(RuntimeException.class, () -> {
-            accountDao.saveAccount(request, account, userId);
-        });
+        // when, then
+        RuntimeException thrown = Assertions.
+            assertThrows(
+                RuntimeException.class, () -> {
+                    accountDao.saveAccount(request, account, userId);
+                });
 
         Assertions.assertEquals("Database error", thrown.getMessage());
     }
@@ -101,9 +107,9 @@ class AccountDaoTest {
         // given
         UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
         AccountRequest request = new AccountRequest(
-                "group",
-                "0123",
-                "텅장"
+            "group",
+            "0123",
+            "텅장"
         );
         String account = "111222333333";
 
@@ -119,13 +125,14 @@ class AccountDaoTest {
         // given
         UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
         AccountRequest request = new AccountRequest(
-                "group",
-                "0123",
-                "텅장"
+            "group",
+            "0123",
+            "텅장"
         );
         String account = "111222333333";
 
-        Mockito.doThrow(new RuntimeException("Database error")).when(accountRepository).save(any(Account.class));
+        Mockito.doThrow(new RuntimeException("Database error")).when(accountRepository)
+            .save(any(Account.class));
 
         // when + then
         RuntimeException thrown = Assertions.assertThrows(RuntimeException.class, () -> {
@@ -133,6 +140,262 @@ class AccountDaoTest {
         });
 
         Assertions.assertEquals("Database error", thrown.getMessage());
+    }
+
+    @Test
+    void 유저_계좌_정보_조회_성공() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        AccountRequest request = new AccountRequest(
+            "group",
+            "0123",
+            "텅장"
+        );
+        String account = "111222333333";
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountName(request.accountName())
+            .build();
+
+        accountDao.saveGroupAccount(request, account, userId);
+
+        // when
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.of(saveAccount));
+
+        Account getAccount = accountDao.getAccount(userId, account);
+
+        // then
+        assertNotNull(getAccount);
+        assertEquals(saveAccount.getAccount(), getAccount.getAccount());
+        assertEquals(saveAccount.getUserId(), getAccount.getUserId());
+    }
+
+    @Test
+    void 유저_계좌_정보_조회_실패() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        AccountRequest request = new AccountRequest(
+            "group",
+            "0123",
+            "텅장"
+        );
+        String account = "111222333333";
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountName(request.accountName())
+            .build();
+
+        accountDao.saveGroupAccount(request, account, userId);
+
+        // when
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            accountDao.getAccount(userId, account);
+        });
+    }
+
+    @Test
+    void 계좌_이름_변경_성공() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        AccountNameRequest request = new AccountNameRequest(account, "asd");
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountName(request.accountName())
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.of(saveAccount));
+
+        // when
+        accountDao.updateName(userId, request);
+
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+        Assertions.assertEquals(saveAccount.getAccountName(), "asd");
+    }
+
+    @Test
+    void 계좌_이름_변경_실패() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        AccountNameRequest request = new AccountNameRequest(account, "asd");
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountName(request.accountName())
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.empty());
+
+        // when, then
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> accountDao.updateName(userId, request));
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+    }
+
+    @Test
+    void 계좌_패스워드_변경_성공() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        AccountPasswordRequest request = new AccountPasswordRequest(account, "1111");
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountPassword(request.accountPassword())
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.of(saveAccount));
+
+        // when
+        accountDao.updatePassword(userId, request);
+
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+        Assertions.assertEquals(saveAccount.getAccountPassword(), "1111");
+    }
+
+    @Test
+    void 계좌_패스워드_변경_실패() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        AccountPasswordRequest request = new AccountPasswordRequest(account, "1111");
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountPassword(request.accountPassword())
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.empty());
+
+        // when, then
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> accountDao.updatePassword(userId, request));
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+    }
+
+    @Test
+    void 계좌_잔액_변경_성공() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        Long money = 5000L;
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .moneyAmount(money)
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.of(saveAccount));
+
+        // when
+        accountDao.updateMoney(userId, account, money);
+
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+        Assertions.assertEquals(saveAccount.getAccountPassword(), "1111");
+    }
+
+    @Test
+    void 계좌_잔액_변경_실패() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        Long money = 5000L;
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .moneyAmount(money)
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.empty());
+
+        // when, then
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> accountDao.updateMoney(userId, account, money));
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+    }
+
+    @Test
+    void 계좌_한도_변경_성공() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        Long dailyLimit = 2000000L;
+        Long onetimeLimit = 2000000L;
+        AccountTransferLimitRequest request = new AccountTransferLimitRequest(account, dailyLimit,
+            onetimeLimit);
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountDailyLimit(dailyLimit)
+            .accountOneTimeLimit(onetimeLimit)
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.of(saveAccount));
+
+        // when
+        accountDao.updateAccountLimit(userId, request);
+
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
+        Assertions.assertEquals(saveAccount.getAccountDailyLimit(), dailyLimit);
+        Assertions.assertEquals(saveAccount.getAccountOneTimeLimit(), onetimeLimit);
+    }
+
+    @Test
+    void 계좌_한도_변경_실패() {
+        // given
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        String account = "111222333333";
+        Long dailyLimit = 2000000L;
+        Long onetimeLimit = 2000000L;
+        AccountTransferLimitRequest request = new AccountTransferLimitRequest(account, dailyLimit,
+            onetimeLimit);
+
+        Account saveAccount = Account.builder()
+            .account(account)
+            .userId(userId)
+            .accountDailyLimit(dailyLimit)
+            .accountOneTimeLimit(onetimeLimit)
+            .build();
+
+        Mockito.when(accountRepository.findOptionalByUserIdAndAccount(userId, account))
+            .thenReturn(Optional.empty());
+
+        // when, then
+        Assertions.assertThrows(IllegalArgumentException.class,
+            () -> accountDao.updateAccountLimit(userId, request));
+        Mockito.verify(accountRepository, times(1))
+            .findOptionalByUserIdAndAccount(saveAccount.getUserId(), saveAccount.getAccount());
     }
 
 }

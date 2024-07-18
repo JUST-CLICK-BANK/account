@@ -2,6 +2,7 @@ package com.click.account.domain.dto.request;
 
 import com.click.account.domain.entity.Account;
 
+import com.click.account.domain.entity.User;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,14 +13,14 @@ public record AccountRequest(
 ) {
     public Account toEntity(
             String account,
-            UUID userId,
+            User user,
             Long accountDailyLimit,
             Long accountOneTimeLimit,
             boolean accountDisable
     ) {
         return Account.builder()
                 .account(account)
-                .userId(userId)
+                .user(user)
                 .accountPassword(accountPassword)
                 .accountName(accountName)
                 .accountDailyLimit(accountDailyLimit)
@@ -30,7 +31,7 @@ public record AccountRequest(
 
     public Account toGroupEntity(
             String account,
-            UUID userId,
+            User user,
             Long accountDailyLimit,
             Long accountOneTimeLimit,
             String groupAccountCode,
@@ -38,7 +39,7 @@ public record AccountRequest(
     ) {
         return Account.builder()
                 .account(account)
-                .userId(userId)
+                .user(user)
                 .accountPassword(accountPassword)
                 .accountName(accountName)
                 .accountDailyLimit(accountDailyLimit)

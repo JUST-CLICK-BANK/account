@@ -6,6 +6,7 @@ import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.response.AccountResponse;
+import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,31 +20,35 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
+
     private final AccountDao accountDao;
     private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
+    private final GenerateAccount generateAccount;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
-
         UUID userId = UUID.fromString(tokenInfo.id());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
-        String account =  makeAccount();
+        String account = makeAccount();
         // 일반 계좌 생성
-        if (req.status().equals("account"))
-            accountDao.saveAccount(req, account, userId);
+        if (req.status().equals("account")) {
+            accountDao.saveAccount(req, account, userId, tokenInfo);
+        }
 
         // 모임 통장 계좌 생성
         if (req.status().equals("group")) {
-            accountDao.saveGroupAccount(req, account, userId);
+            accountDao.saveGroupAccount(req, account, userId, tokenInfo);
             groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
         }
     }
 
     private String makeAccount() {
-        String account = GenerateAccount.generateAccount();
-        if(accountDao.compareAccount(account)) return makeAccount();
+        String account = generateAccount.generateAccount();
+        if (accountDao.compareAccount(account)) {
+            return makeAccount();
+        }
         return account;
     }
 
@@ -60,12 +65,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
         if (req.status().equals("deposit")) {
-            Long money = accountDao.getAccount(userId, req.account()).getMoneyAmount() + req.moneyAmount();
+            Long money =
+                accountDao.getAccount(req.account()).getMoneyAmount() + req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
         }
         // 돈이 0원일때 예외 처리 필요
         if (req.status().equals("transfer")) {
-            Long money = accountDao.getAccount(userId, req.account()).getMoneyAmount() - req.moneyAmount();
+            Long money =
+                accountDao.getAccount(req.account()).getMoneyAmount() - req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
         }
     }
@@ -77,29 +84,36 @@ public class AccountServiceImpl implements AccountService {
 
 
     public List<Account> findByUserId(UUID userId) {
-        return accountRepository.findByUserId(userId);
-    }
-    @Override
-    public List<AccountResponse> findDisabledAccountByUserId(UUID userId) {
-        return accountRepository.findByUserIdAndAccountDisable(userId, true)
-                .stream()
-                .map(AccountResponse::from)
-                .collect(Collectors.toList());
+        return accountRepository.findByUser_UserId(userId);
     }
 
     @Override
-    public List<String> findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
-        return accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true)
-                .stream()
-                .map(Account::getGroupAccountCode)
-                .collect(Collectors.toList());
+    public List<AccountResponse> findDisabledAccountByUserId(UUID userId) {
+        return accountRepository.findByUser_UserIdAndAccountDisable(userId, true)
+            .stream()
+            .map(AccountResponse::from)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
+        return accountRepository.findByUser_UserIdAndAccountAndAccountDisable(userId, account, true)
+            .orElseThrow(IllegalArgumentException::new)
+            .getGroupAccountCode();
     }
 
     @Override
     @Transactional
     public void deleteAccount(UUID userId, String account) {
-        Account delete = accountRepository.findOptionalByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
+        Account delete = accountRepository.findOptionalByUser_UserIdAndAccount(userId, account)
+            .orElseThrow(IllegalArgumentException::new);
         delete.setAccountDisable(false);
+    }
+
+    @Override
+    public AccountUserInfo getAccountFromUserId(String requestAccount) {
+        Account account = accountDao.getAccount(requestAccount);
+        return AccountUserInfo.from(account);
     }
 }
 

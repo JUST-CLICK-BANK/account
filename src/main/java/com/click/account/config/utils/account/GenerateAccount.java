@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GenerateAccount {
-    public static String generateAccount() {
+
+    public String generateAccount() {
         String account = RandomStringUtils.random(9, 48, 57, false, true);
         return "416" + account;
     }
