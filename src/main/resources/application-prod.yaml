@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: account
+  datasource:
+    url: jdbc:postgresql://localhost:5432/click?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: postgres
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+jwt:
+  secret: thisispublickeythisispublickeythisispublickeythisispublickey

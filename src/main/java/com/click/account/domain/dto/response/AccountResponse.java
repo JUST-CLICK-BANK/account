@@ -9,6 +9,7 @@ public record AccountResponse(
         String accountName,
         Long moneyAmount
 ) {
+
     public static AccountResponse from(Account account) {
         return AccountResponse.builder()
                 .account(account.getAccount())

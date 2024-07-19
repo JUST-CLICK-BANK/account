@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GroupAccountRepository extends JpaRepository<GroupAccount, Long> {
+
     Optional<GroupAccount> findByAccountAndUserId(String account, UUID userId);
+
     boolean existsByAccountAndAdminIsTrue(String account);
 
 }

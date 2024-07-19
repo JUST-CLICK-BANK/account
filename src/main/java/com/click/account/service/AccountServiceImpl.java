@@ -8,6 +8,7 @@ import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.GroupAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
+import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccount;
 import com.click.account.domain.repository.AccountRepository;
@@ -23,32 +24,36 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
+
     private final AccountDao accountDao;
     private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
     private final GroupAccountRepository groupAccountRepository;
+    private final GenerateAccount generateAccount;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
-
         UUID userId = UUID.fromString(tokenInfo.id());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
-        String account =  makeAccount();
+        String account = makeAccount();
         // 일반 계좌 생성
-        if (req.status().equals("account"))
-            accountDao.saveAccount(req, account, userId);
+        if (req.status().equals("account")) {
+            accountDao.saveAccount(req, account, userId, tokenInfo);
+        }
 
         // 모임 통장 계좌 생성
         if (req.status().equals("group")) {
-            accountDao.saveGroupAccount(req, account, userId);
+            accountDao.saveGroupAccount(req, account, userId, tokenInfo);
             groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
         }
     }
 
     private String makeAccount() {
-        String account = GenerateAccount.generateAccount();
-        if(accountDao.compareAccount(account)) return makeAccount();
+        String account = generateAccount.generateAccount();
+        if (accountDao.compareAccount(account)) {
+            return makeAccount();
+        }
         return account;
     }
 
@@ -65,12 +70,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
         if (req.status().equals("deposit")) {
-            Long money = accountDao.getAccount(userId, req.account()).getMoneyAmount() + req.moneyAmount();
+            Long money =
+                accountDao.getAccount(req.account()).getMoneyAmount() + req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
         }
         // 돈이 0원일때 예외 처리 필요
         if (req.status().equals("transfer")) {
-            Long money = accountDao.getAccount(userId, req.account()).getMoneyAmount() - req.moneyAmount();
+            Long money =
+                accountDao.getAccount(req.account()).getMoneyAmount() - req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
         }
     }
@@ -115,14 +122,20 @@ public class AccountServiceImpl implements AccountService {
             throw new IllegalArgumentException("그룹 코드를 찾을 수 없습니다.");
         }
         return accountResult.getGroupAccountCode(); // 바로 GroupAccountCode 반환
-
     }
 
     @Override
     @Transactional
     public void deleteAccount(UUID userId, String account) {
-        Account delete = accountRepository.findOptionalByUserIdAndAccount(userId, account).orElseThrow(IllegalArgumentException::new);
+        Account delete = accountRepository.findOptionalByUser_UserIdAndAccount(userId, account)
+            .orElseThrow(IllegalArgumentException::new);
         delete.setAccountDisable(false);
+    }
+
+    @Override
+    public AccountUserInfo getAccountFromUserId(String requestAccount) {
+        Account account = accountDao.getAccount(requestAccount);
+        return AccountUserInfo.from(account);
     }
 }
 
