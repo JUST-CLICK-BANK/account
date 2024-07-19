@@ -53,4 +53,28 @@ class AccountRepositoryTest {
         Assertions.assertNotEquals(saveAccount.getAccount(), "111222333334");
         Assertions.assertNotEquals(saveAccount.getUserId(), UUID.fromString("e700cb76-14ab-403f-9fee-e05c5288abf7"));
     }
+
+    @Test
+    void 계좌_삭제_성공() {
+        String account = "111222333333";
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        Long dailyLimit = 1000000L;
+        Long onetimeLimit = 1000000L;
+        Account request = new Account(account, userId, "1234", "name", dailyLimit, onetimeLimit, 0L, "groupCode", true);
+        accountRepository.save(request);
+        accountRepository.delete(request);
+        Assertions.assertTrue(accountRepository.findByAccount(account).isEmpty());
+    }
+    @Test
+    void 계좌_삭제_실패() {
+        String account = "111222333333";
+        UUID userId = UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866");
+        Long dailyLimit = 1000000L;
+        Long onetimeLimit = 1000000L;
+        Account request = new Account(account, userId, "1234", "name", dailyLimit, onetimeLimit, 0L, "groupCode", true);
+        accountRepository.save(request);
+
+        Assertions.assertFalse(accountRepository.findByAccount(account).isEmpty());
+
+    }
 }
