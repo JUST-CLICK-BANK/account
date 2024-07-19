@@ -19,6 +19,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/accounts")
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*",
+    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class AccountController {
 
     private final AccountService accountService;
@@ -122,11 +124,11 @@ public class AccountController {
 
     @GetMapping("/others")
     public AccountUserInfo getAccountUserInfo(
-        @RequestHeader("Authorization") String bearerToken,
+//        @RequestHeader("Authorization") String bearerToken,
         @RequestParam("account") String account
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+//        String token = bearerToken.substring(7);
+//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return accountService.getAccountFromUserId(account);
     }
 

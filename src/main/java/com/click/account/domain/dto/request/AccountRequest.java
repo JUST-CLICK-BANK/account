@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record AccountRequest(
-        String status,
-        String accountPassword,
-        String accountName
+        String accountStatus,
+        String accountPassword
 ) {
     public Account toEntity(
             String account,
+            String accountName,
             User user,
             Long accountDailyLimit,
             Long accountOneTimeLimit,
@@ -20,9 +20,10 @@ public record AccountRequest(
     ) {
         return Account.builder()
                 .account(account)
+                .accountName(accountName)
                 .user(user)
                 .accountPassword(accountPassword)
-                .accountName(accountName)
+                .moneyAmount(0L)
                 .accountDailyLimit(accountDailyLimit)
                 .accountOneTimeLimit(accountOneTimeLimit)
                 .accountDisable(accountDisable)
@@ -31,6 +32,7 @@ public record AccountRequest(
 
     public Account toGroupEntity(
             String account,
+            String accountName,
             User user,
             Long accountDailyLimit,
             Long accountOneTimeLimit,
@@ -42,6 +44,7 @@ public record AccountRequest(
                 .user(user)
                 .accountPassword(accountPassword)
                 .accountName(accountName)
+                .moneyAmount(0L)
                 .accountDailyLimit(accountDailyLimit)
                 .accountOneTimeLimit(accountOneTimeLimit)
                 .accountDisable(accountDisable)

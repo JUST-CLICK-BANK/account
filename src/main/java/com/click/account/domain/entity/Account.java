@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -35,8 +36,8 @@ public class Account {
     @Column(name = "ACC_ONE_TIME_LIMIT")
     private Long accountOneTimeLimit;
 
-    @Column(name = "MONYE_AMOUNT")
-    private Long moneyAmount;
+    @Column(name = "MONYE_AMOUNT", columnDefinition = "bigint default 0")
+    private Long moneyAmount = 0L;
 
     @Column(name = "GROUP_ACCOUNT_CODE")
     private String groupAccountCode;
