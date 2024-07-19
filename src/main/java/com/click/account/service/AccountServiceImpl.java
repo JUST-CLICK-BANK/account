@@ -89,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo) {
-        List<Account> disabledAccount = accountRepository.findByUserIdAndAccountDisable(userId,true);
+        List<Account> disabledAccount = accountRepository.findByUser_UserIdAndAccountDisable(userId,true);
         if (disabledAccount.isEmpty()) {
             throw new IllegalArgumentException("게좌 없음");
         }
@@ -115,14 +115,14 @@ public class AccountServiceImpl implements AccountService {
 //    }
 
 
-    @Override
-    public String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
-        Account accountResult = accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true);
-        if (accountResult == null) {
-            throw new IllegalArgumentException("그룹 코드를 찾을 수 없습니다.");
-        }
-        return accountResult.getGroupAccountCode(); // 바로 GroupAccountCode 반환
-    }
+//    @Override
+//    public String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
+//        Account accountResult = accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true);
+//        if (accountResult == null) {
+//            throw new IllegalArgumentException("그룹 코드를 찾을 수 없습니다.");
+//        }
+//        return accountResult.getGroupAccountCode(); // 바로 GroupAccountCode 반환
+//    }
 
     @Override
     @Transactional

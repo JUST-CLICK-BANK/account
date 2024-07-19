@@ -95,28 +95,19 @@ public class AccountController {
 //        accountService.deleteAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), account);
     }
   
-//    @GetMapping("disable")
-//    public List<GroupAccountResponse> getDisabledAccountByUserId(@RequestHeader ("Authorization") String bearerToken) {
-//        String token = bearerToken.substring(7);
-//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-//       return accountService.findDisabledAccountByUserId(UUID.fromString(tokenInfo.id()));
-//
-//    }
+
   
     @GetMapping("user-account")
     public List<UserAccountResponse> getAccountByUserId(@RequestHeader ("Authorization") String bearerToken
+//                                                        @RequestParam("userId")UUID userId
+//                                                        @RequestParam("userName") String userName
     ) {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
     }
 
-    @GetMapping("group")
-    public String getGroupAccountCodeByUserIdAndAccount(@RequestHeader ("Authorization") String bearerToken, @RequestParam("account") String account) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        return accountService.findGroupAccountCodeByUserIdAndAccount(UUID.fromString(tokenInfo.id()), account);
-    }
+
 
     @GetMapping("/others")
     public AccountUserInfo getAccountUserInfo(
