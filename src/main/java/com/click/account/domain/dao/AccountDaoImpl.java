@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -30,24 +31,12 @@ public class AccountDaoImpl implements AccountDao {
 
     @Override
     public void saveAccount(AccountRequest req, String account, UUID userId, TokenInfo tokenInfo) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        User user;
-        if (userOptional.isPresent()) {
-            user = userOptional.get();
-        } else {
-            user = User.builder()
-                .userId(userId)
-                .userNickName(tokenInfo.name())
-                .userPorfileImg(tokenInfo.img())
-                .userCode(tokenInfo.code())
-                .rank(tokenInfo.rank())
-                .build();
-            userRepository.save(user);
-        }
+        User user = getUser(userId, tokenInfo);
 
         accountRepository.save(
             req.toEntity(
                 account,
+                tokenInfo.name()+"의 통장",
                 user,
                 TransferLimit.getDailyLimit(),
                 TransferLimit.getOnetimeLimit(),
@@ -63,6 +52,7 @@ public class AccountDaoImpl implements AccountDao {
         accountRepository.save(
             req.toGroupEntity(
                 account,
+                tokenInfo.name()+"의 통장",
                 user,
                 TransferLimit.getDailyLimit(),
                 TransferLimit.getOnetimeLimit(),
@@ -109,18 +99,21 @@ public class AccountDaoImpl implements AccountDao {
     public void updatePassword(UUID userId, AccountPasswordRequest req) {
         Account account = getAccount(req.account());
         account.updatePassword(req.accountPassword());
+        accountRepository.save(account);
     }
 
     @Override
     public void updateMoney(UUID userId, String generatedAccount, Long moneyAmount) {
         Account account = getAccount(generatedAccount);
         account.updateMoney(moneyAmount);
+        accountRepository.save(account);
     }
 
     @Override
     public void updateAccountLimit(UUID userId, AccountTransferLimitRequest req) {
         Account account = getAccount(req.account());
         account.updateTransferLimit(req.accountDailyLimit(), req.accountOneTimeLimit());
+        accountRepository.save(account);
     }
 
 }
