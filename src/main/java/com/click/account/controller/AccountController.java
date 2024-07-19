@@ -4,6 +4,8 @@ import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.request.AccountRequest;
+import com.click.account.domain.dto.response.GroupAccountResponse;
+import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
@@ -92,32 +94,28 @@ public class AccountController {
         accountService.deleteAccount(UUID.fromString(tokenInfo.id()), account);
 //        accountService.deleteAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), account);
     }
-
-    @GetMapping("disable")
-    public List<AccountResponse> getDisabledAccountByUserId(
-        @RequestHeader("Authorization") String bearerToken) {
+  
+//    @GetMapping("disable")
+//    public List<GroupAccountResponse> getDisabledAccountByUserId(@RequestHeader ("Authorization") String bearerToken) {
+//        String token = bearerToken.substring(7);
+//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+//       return accountService.findDisabledAccountByUserId(UUID.fromString(tokenInfo.id()));
+//
+//    }
+  
+    @GetMapping("user-account")
+    public List<UserAccountResponse> getAccountByUserId(@RequestHeader ("Authorization") String bearerToken
+    ) {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        List<AccountResponse> disabledAccounts = accountService.findDisabledAccountByUserId(
-            UUID.fromString(tokenInfo.id()));
-        if (disabledAccounts.isEmpty()) {
-            throw new IllegalArgumentException("비활성화된 계좌를 찾을 수 없습니다.");
-        }
-        return disabledAccounts;
+        return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
     }
 
     @GetMapping("group")
-    public String getGroupAccountCodeByUserIdAndAccount(
-        @RequestHeader("Authorization") String bearerToken,
-        @RequestParam("account") String account) {
+    public String getGroupAccountCodeByUserIdAndAccount(@RequestHeader ("Authorization") String bearerToken, @RequestParam("account") String account) {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        String groupCodes = accountService.findGroupAccountCodeByUserIdAndAccount(
-            UUID.fromString(tokenInfo.id()), account);
-        if (groupCodes.isEmpty()) {
-            throw new IllegalArgumentException(" 그룹 코드를 찾을 수 없습니다.");
-        }
-        return groupCodes;
+        return accountService.findGroupAccountCodeByUserIdAndAccount(UUID.fromString(tokenInfo.id()), account);
     }
 
     @GetMapping("/others")

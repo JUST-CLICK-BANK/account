@@ -2,6 +2,8 @@ package com.click.account.service;
 
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dto.request.*;
+import com.click.account.domain.dto.response.GroupAccountResponse;
+import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
@@ -17,9 +19,10 @@ public interface AccountService {
     void updateAccountLimit(UUID userId, AccountTransferLimitRequest req);
     void deleteAccount(UUID userId,String account);
 
-    AccountUserInfo getAccountFromUserId(String account);
-    List<Account> findByUserId(UUID userId);
-    List<AccountResponse> findDisabledAccountByUserId(UUID userId);
+//    List<Account> findByUserId(UUID userId);
+//    List<GroupAccountResponse> findDisabledAccountByUserId(UUID userId);
     String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
-
+    List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo);
+    AccountUserInfo getAccountFromUserId(String account);
+    String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
 }

@@ -6,9 +6,13 @@ import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.response.AccountResponse;
+import com.click.account.domain.dto.response.GroupAccountResponse;
+import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
+import com.click.account.domain.entity.GroupAccount;
 import com.click.account.domain.repository.AccountRepository;
+import com.click.account.domain.repository.GroupAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountDao accountDao;
     private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
+    private final GroupAccountRepository groupAccountRepository;
     private final GenerateAccount generateAccount;
 
     @Override
@@ -82,24 +87,41 @@ public class AccountServiceImpl implements AccountService {
         accountDao.updateAccountLimit(userId, req);
     }
 
-
-    public List<Account> findByUserId(UUID userId) {
-        return accountRepository.findByUser_UserId(userId);
-    }
-
     @Override
-    public List<AccountResponse> findDisabledAccountByUserId(UUID userId) {
-        return accountRepository.findByUser_UserIdAndAccountDisable(userId, true)
-            .stream()
-            .map(AccountResponse::from)
-            .collect(Collectors.toList());
+    public List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo) {
+        List<Account> disabledAccount = accountRepository.findByUserIdAndAccountDisable(userId,true);
+        if (disabledAccount.isEmpty()) {
+            throw new IllegalArgumentException("게좌 없음");
+        }
+        List<AccountResponse> accountResponses = disabledAccount.stream()
+                .map(AccountResponse::from)
+                .collect(Collectors.toList());
+
+        return List.of(UserAccountResponse.from(accountResponses, tokenInfo));
     }
+//
+//    @Override
+//    public List<GroupAccountResponse> findUserAccountByUserIdAndAccount(UUID userId, String nickName, String profileImg) {
+//        List<Account> disableaccount = accountRepository.findByUserIdAndAccountDisable(userId,true);
+//        if (disableaccount.isEmpty()){
+//            throw new IllegalArgumentException("계좌 없음");
+//        }
+//        return disableaccount.stream()
+//                .map(account -> {
+//                    GroupAccount groupAccount = groupAccountRepository.findByAccountAndUserId(account.getAccount(), userId).orElseThrow(IllegalArgumentException::new);
+//                    return GroupAccountResponse.from(account, groupAccount);
+//                })
+//                .collect(Collectors.toList());
+//    }
+
 
     @Override
     public String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
-        return accountRepository.findByUser_UserIdAndAccountAndAccountDisable(userId, account, true)
-            .orElseThrow(IllegalArgumentException::new)
-            .getGroupAccountCode();
+        Account accountResult = accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true);
+        if (accountResult == null) {
+            throw new IllegalArgumentException("그룹 코드를 찾을 수 없습니다.");
+        }
+        return accountResult.getGroupAccountCode(); // 바로 GroupAccountCode 반환
     }
 
     @Override
