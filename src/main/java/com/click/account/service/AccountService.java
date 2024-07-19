@@ -21,8 +21,7 @@ public interface AccountService {
 
 //    List<Account> findByUserId(UUID userId);
 //    List<GroupAccountResponse> findDisabledAccountByUserId(UUID userId);
-    String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
+//    String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
     List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo);
     AccountUserInfo getAccountFromUserId(String account);
-    String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
 }
