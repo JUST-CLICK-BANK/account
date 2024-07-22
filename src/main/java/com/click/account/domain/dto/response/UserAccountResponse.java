@@ -4,11 +4,12 @@ import com.click.account.config.utils.jwt.TokenInfo;
 import lombok.Builder;
 
 import java.util.List;
+
 @Builder
 public record UserAccountResponse(
-List<AccountResponse> accounts,
-String userName,
-String userImg
+    List<AccountResponse> accounts,
+    String userName,
+    String userImg
 ) {
     public static UserAccountResponse from(List<AccountResponse> accountResponses, TokenInfo tokenInfo) {
         return UserAccountResponse.builder()

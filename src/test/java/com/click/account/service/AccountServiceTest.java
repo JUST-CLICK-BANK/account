@@ -61,8 +61,7 @@ class AccountServiceTest {
         );
         AccountRequest request = new AccountRequest(
             "account",
-            "description",
-            "텅장"
+            "description"
         );
         UUID userId = UUID.fromString(tokenInfo.id());
         String account = "416111222";

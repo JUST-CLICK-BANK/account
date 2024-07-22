@@ -2,13 +2,13 @@ spring:
   application:
     name: account
   datasource:
-    url: jdbc:postgresql://localhost:5432/click?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://account-postgres-account:5432/click?characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: {user}
+    password: {password}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
 jwt:
-  secret: thisispublickeythisispublickeythisispublickeythisispublickey
+  secret: {secret}

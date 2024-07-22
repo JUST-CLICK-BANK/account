@@ -33,6 +33,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
+        System.out.println(req.toString());
         UUID userId = UUID.fromString(tokenInfo.id());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
@@ -86,6 +87,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateAccountLimit(UUID userId, AccountTransferLimitRequest req) {
+        System.out.println(req.accountDailyLimit());
+        System.out.println(req.accountOneTimeLimit());
         accountDao.updateAccountLimit(userId, req);
     }
 
