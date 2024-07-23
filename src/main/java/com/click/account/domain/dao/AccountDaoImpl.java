@@ -52,7 +52,7 @@ public class AccountDaoImpl implements AccountDao {
         accountRepository.save(
             req.toGroupEntity(
                 account,
-                tokenInfo.name()+"의 통장",
+                tokenInfo.name()+"의 모임 통장",
                 user,
                 TransferLimit.getDailyLimit(),
                 TransferLimit.getOnetimeLimit(),

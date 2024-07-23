@@ -1,18 +1,16 @@
 package com.click.account.service;
 
+import com.click.account.config.apis.FeignAccountHistory;
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.response.AccountResponse;
-import com.click.account.domain.dto.response.GroupAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
-import com.click.account.domain.entity.GroupAccount;
 import com.click.account.domain.repository.AccountRepository;
-import com.click.account.domain.repository.GroupAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +26,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountDao accountDao;
     private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
-    private final GroupAccountRepository groupAccountRepository;
     private final GenerateAccount generateAccount;
+    private final FeignAccountHistory feignDeposit;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
@@ -69,18 +67,23 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
-        Long amount = accountDao.getAccount(req.account()).getMoneyAmount();
+        Account accountInfo = accountDao.getAccount(req.account());
+
         // 입금 받은 경우
         if (req.accountStatus().equals("deposit")) {
-            Long money = amount + req.moneyAmount();
+            Long money = accountInfo.getMoneyAmount() + req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
+            DepositRequest depositRequest = DepositRequest.toTranfer(req, accountInfo.getAccountName(), accountInfo.getMoneyAmount());
+            feignDeposit.deposit(depositRequest);
         }
-        // 돈이 0원일때 예외 처리 필요
+
         // 출금한 경우
         if (req.accountStatus().equals("transfer")) {
-            if (amount < 0) throw new IllegalArgumentException("잔액이 부족합니다.");
-            long money = amount - req.moneyAmount();
+            if (accountInfo.getMoneyAmount() <= 0) throw new IllegalArgumentException("잔액이 부족합니다.");
+            long money = accountInfo.getMoneyAmount()  - req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
+            WithdrawRequest withdrawRequest = WithdrawRequest.toTransfer(req, accountInfo.getAccountName(), accountInfo.getMoneyAmount());
+            feignDeposit.withdraw(withdrawRequest);
         }
     }
 
