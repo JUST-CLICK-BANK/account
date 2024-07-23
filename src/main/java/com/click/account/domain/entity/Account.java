@@ -3,9 +3,6 @@ package com.click.account.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-import org.hibernate.annotations.ColumnDefault;
-
 @Entity
 @Getter
 @AllArgsConstructor
@@ -20,9 +17,6 @@ public class Account {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
-
-//    @Column(name = "USER_ID")
-//    private UUID userId;
 
     @Column(name = "ACCOUNT_PASSWORD")
     private String accountPassword;

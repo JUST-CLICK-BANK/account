@@ -1,10 +1,8 @@
 package com.click.account.domain.dao;
 
 import com.click.account.config.utils.jwt.TokenInfo;
-import com.click.account.domain.dto.request.GroupAccountRequest;
 import com.click.account.domain.entity.GroupAccount;
 import com.click.account.domain.repository.GroupAccountRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

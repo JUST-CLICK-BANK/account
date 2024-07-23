@@ -31,6 +31,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
+        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         UUID userId = UUID.fromString(tokenInfo.id());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
@@ -57,16 +58,19 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateName(UUID userId, AccountNameRequest req) {
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         accountDao.updateName(userId, req);
     }
 
     @Override
     public void updatePassword(UUID userId, AccountPasswordRequest req) {
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         accountDao.updatePassword(userId, req);
     }
 
     @Override
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account accountInfo = accountDao.getAccount(req.account());
 
         // 입금 받은 경우
@@ -89,6 +93,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateAccountLimit(UUID userId, AccountTransferLimitRequest req) {
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         accountDao.updateAccountLimit(userId, req);
     }
 
@@ -104,30 +109,6 @@ public class AccountServiceImpl implements AccountService {
 
         return List.of(UserAccountResponse.from(accountResponses, tokenInfo));
     }
-//
-//    @Override
-//    public List<GroupAccountResponse> findUserAccountByUserIdAndAccount(UUID userId, String nickName, String profileImg) {
-//        List<Account> disableaccount = accountRepository.findByUserIdAndAccountDisable(userId,true);
-//        if (disableaccount.isEmpty()){
-//            throw new IllegalArgumentException("계좌 없음");
-//        }
-//        return disableaccount.stream()
-//                .map(account -> {
-//                    GroupAccount groupAccount = groupAccountRepository.findByAccountAndUserId(account.getAccount(), userId).orElseThrow(IllegalArgumentException::new);
-//                    return GroupAccountResponse.from(account, groupAccount);
-//                })
-//                .collect(Collectors.toList());
-//    }
-
-
-//    @Override
-//    public String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
-//        Account accountResult = accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true);
-//        if (accountResult == null) {
-//            throw new IllegalArgumentException("그룹 코드를 찾을 수 없습니다.");
-//        }
-//        return accountResult.getGroupAccountCode(); // 바로 GroupAccountCode 반환
-//    }
 
     @Override
     @Transactional
@@ -138,7 +119,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountUserInfo getAccountFromUserId(String requestAccount) {
+    public AccountUserInfo getAccountFromUserId(String requestAccount, TokenInfo tokenInfo) {
+        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(requestAccount);
         return AccountUserInfo.from(account);
     }

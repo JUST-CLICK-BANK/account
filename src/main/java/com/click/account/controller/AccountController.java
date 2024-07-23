@@ -4,11 +4,8 @@ import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.request.AccountRequest;
-import com.click.account.domain.dto.response.GroupAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
-import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
-import com.click.account.domain.entity.Account;
 import com.click.account.service.AccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +19,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/accounts")
 @CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*",
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
+    methods = {
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT,
+        RequestMethod.DELETE,
+        RequestMethod.OPTIONS
+})
 public class AccountController {
 
     private final AccountService accountService;
@@ -39,7 +42,6 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.saveAccount(tokenInfo, req);
-//        accountService.saveAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
 
     @PutMapping("/name")
@@ -50,7 +52,6 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updateName(UUID.fromString(tokenInfo.id()), req);
-//        accountService.updateName(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
 
     @PutMapping("/password")
@@ -61,7 +62,6 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updatePassword(UUID.fromString(tokenInfo.id()), req);
-//        accountService.updatePassword(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
 
     @PutMapping("/amount")
@@ -72,7 +72,6 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updateMoney(UUID.fromString(tokenInfo.id()), req);
-//        accountService.updateMoney(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
 
     @PutMapping("/limit")
@@ -83,7 +82,6 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updateAccountLimit(UUID.fromString(tokenInfo.id()), req);
-//        accountService.updateAccountLimit(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), req);
     }
 
     @DeleteMapping()
@@ -94,16 +92,10 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.deleteAccount(UUID.fromString(tokenInfo.id()), account);
-//        accountService.deleteAccount(UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff866"), account);
     }
   
-
-  
     @GetMapping("user-account")
-    public List<UserAccountResponse> getAccountByUserId(@RequestHeader ("Authorization") String bearerToken
-//                                                        @RequestParam("userId")UUID userId
-//                                                        @RequestParam("userName") String userName
-    ) {
+    public List<UserAccountResponse> getAccountByUserId(@RequestHeader ("Authorization") String bearerToken) {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
@@ -113,12 +105,12 @@ public class AccountController {
 
     @GetMapping("/others")
     public AccountUserInfo getAccountUserInfo(
-//        @RequestHeader("Authorization") String bearerToken,
+        @RequestHeader("Authorization") String bearerToken,
         @RequestParam("account") String account
     ) {
-//        String token = bearerToken.substring(7);
-//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        return accountService.getAccountFromUserId(account);
+        String token = bearerToken.substring(7);
+        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+        return accountService.getAccountFromUserId(account, tokenInfo);
     }
 
 }

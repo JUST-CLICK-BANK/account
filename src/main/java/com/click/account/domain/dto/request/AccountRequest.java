@@ -3,8 +3,6 @@ package com.click.account.domain.dto.request;
 import com.click.account.domain.entity.Account;
 
 import com.click.account.domain.entity.User;
-import java.util.List;
-import java.util.UUID;
 
 public record AccountRequest(
         String accountStatus,
