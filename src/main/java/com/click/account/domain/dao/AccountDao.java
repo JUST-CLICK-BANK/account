@@ -9,12 +9,7 @@ import java.util.UUID;
 
 public interface AccountDao {
     boolean compareAccount(String generatedAccount);
-    void saveAccount(AccountRequest req, String account, UUID userId, TokenInfo tokenInfo);
-    void saveGroupAccount(AccountRequest req, String account, UUID userId, TokenInfo tokenInfo);
-    User getUser(UUID userId, TokenInfo tokenInfo);
+    void saveAccount(AccountRequest req, String account, User user);
+    void saveGroupAccount(AccountRequest req, String account, User user);
     Account getAccount(String Account);
-    void updateName(UUID userId, AccountNameRequest req);
-    void updatePassword(UUID userId, AccountPasswordRequest req);
-    void updateMoney(UUID userId, String generAccount, Long moneyAmount);
-    void updateAccountLimit(UUID userId, AccountTransferLimitRequest req);
 }

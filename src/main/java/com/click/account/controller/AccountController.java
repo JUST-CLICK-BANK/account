@@ -30,8 +30,16 @@ public class AccountController {
 
     private final AccountService accountService;
     private final JwtUtils jwtUtils;
-    private static final UUID HARDCODED_USER_ID = UUID.fromString(
-        "71a90366-30e6-4e7e-a259-01a7947ff866");
+
+    @PostMapping("/user")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void saveUser(
+        @RequestHeader("Authorization") String bearerToken
+    ) {
+        String token = bearerToken.substring(7);
+        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+
+    }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -95,7 +103,7 @@ public class AccountController {
     }
   
     @GetMapping("user-account")
-    public List<UserAccountResponse> getAccountByUserId(@RequestHeader ("Authorization") String bearerToken) {
+    public List<UserAccountResponse> getAccountByUserId(@RequestHeader("Authorization") String bearerToken) {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
