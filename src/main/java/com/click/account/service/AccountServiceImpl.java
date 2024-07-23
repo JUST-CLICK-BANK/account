@@ -1,18 +1,16 @@
 package com.click.account.service;
 
+import com.click.account.config.apis.FeignAccountHistory;
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
 import com.click.account.domain.dto.request.*;
 import com.click.account.domain.dto.response.AccountResponse;
-import com.click.account.domain.dto.response.GroupAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.entity.Account;
-import com.click.account.domain.entity.GroupAccount;
 import com.click.account.domain.repository.AccountRepository;
-import com.click.account.domain.repository.GroupAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +26,12 @@ public class AccountServiceImpl implements AccountService {
     private final AccountDao accountDao;
     private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
-    private final GroupAccountRepository groupAccountRepository;
     private final GenerateAccount generateAccount;
+    private final FeignAccountHistory feignDeposit;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
-        System.out.println(req.toString());
+        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         UUID userId = UUID.fromString(tokenInfo.id());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
@@ -60,35 +58,42 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void updateName(UUID userId, AccountNameRequest req) {
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         accountDao.updateName(userId, req);
     }
 
     @Override
     public void updatePassword(UUID userId, AccountPasswordRequest req) {
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         accountDao.updatePassword(userId, req);
     }
 
     @Override
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
-        Long amount = accountDao.getAccount(req.account()).getMoneyAmount();
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
+        Account accountInfo = accountDao.getAccount(req.account());
+
         // 입금 받은 경우
         if (req.accountStatus().equals("deposit")) {
-            Long money = amount + req.moneyAmount();
+            Long money = accountInfo.getMoneyAmount() + req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
+            DepositRequest depositRequest = DepositRequest.toTranfer(req, accountInfo.getAccountName(), accountInfo.getMoneyAmount());
+            feignDeposit.deposit(depositRequest);
         }
-        // 돈이 0원일때 예외 처리 필요
+
         // 출금한 경우
         if (req.accountStatus().equals("transfer")) {
-            if (amount < 0) throw new IllegalArgumentException("잔액이 부족합니다.");
-            long money = amount - req.moneyAmount();
+            if (accountInfo.getMoneyAmount() <= 0) throw new IllegalArgumentException("잔액이 부족합니다.");
+            long money = accountInfo.getMoneyAmount()  - req.moneyAmount();
             accountDao.updateMoney(userId, req.account(), money);
+            WithdrawRequest withdrawRequest = WithdrawRequest.toTransfer(req, accountInfo.getAccountName(), accountInfo.getMoneyAmount());
+            feignDeposit.withdraw(withdrawRequest);
         }
     }
 
     @Override
     public void updateAccountLimit(UUID userId, AccountTransferLimitRequest req) {
-        System.out.println(req.accountDailyLimit());
-        System.out.println(req.accountOneTimeLimit());
+        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         accountDao.updateAccountLimit(userId, req);
     }
 
@@ -104,30 +109,6 @@ public class AccountServiceImpl implements AccountService {
 
         return List.of(UserAccountResponse.from(accountResponses, tokenInfo));
     }
-//
-//    @Override
-//    public List<GroupAccountResponse> findUserAccountByUserIdAndAccount(UUID userId, String nickName, String profileImg) {
-//        List<Account> disableaccount = accountRepository.findByUserIdAndAccountDisable(userId,true);
-//        if (disableaccount.isEmpty()){
-//            throw new IllegalArgumentException("계좌 없음");
-//        }
-//        return disableaccount.stream()
-//                .map(account -> {
-//                    GroupAccount groupAccount = groupAccountRepository.findByAccountAndUserId(account.getAccount(), userId).orElseThrow(IllegalArgumentException::new);
-//                    return GroupAccountResponse.from(account, groupAccount);
-//                })
-//                .collect(Collectors.toList());
-//    }
-
-
-//    @Override
-//    public String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account) {
-//        Account accountResult = accountRepository.findByUserIdAndAccountAndAccountDisable(userId, account,true);
-//        if (accountResult == null) {
-//            throw new IllegalArgumentException("그룹 코드를 찾을 수 없습니다.");
-//        }
-//        return accountResult.getGroupAccountCode(); // 바로 GroupAccountCode 반환
-//    }
 
     @Override
     @Transactional
@@ -138,7 +119,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountUserInfo getAccountFromUserId(String requestAccount) {
+    public AccountUserInfo getAccountFromUserId(String requestAccount, TokenInfo tokenInfo) {
+        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(requestAccount);
         return AccountUserInfo.from(account);
     }

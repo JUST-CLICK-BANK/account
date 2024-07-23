@@ -18,10 +18,6 @@ public interface AccountService {
     void updateMoney(UUID userId, AccountMoneyRequest req);
     void updateAccountLimit(UUID userId, AccountTransferLimitRequest req);
     void deleteAccount(UUID userId,String account);
-
-//    List<Account> findByUserId(UUID userId);
-//    List<GroupAccountResponse> findDisabledAccountByUserId(UUID userId);
-//    String findGroupAccountCodeByUserIdAndAccount(UUID userId, String account);
     List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo);
-    AccountUserInfo getAccountFromUserId(String account);
+    AccountUserInfo getAccountFromUserId(String account, TokenInfo tokenInfo);
 }

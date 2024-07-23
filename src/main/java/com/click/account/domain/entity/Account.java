@@ -3,9 +3,6 @@ package com.click.account.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-import org.hibernate.annotations.ColumnDefault;
-
 @Entity
 @Getter
 @AllArgsConstructor
@@ -21,9 +18,6 @@ public class Account {
     @JoinColumn(name = "USER_ID")
     private User user;
 
-//    @Column(name = "USER_ID")
-//    private UUID userId;
-
     @Column(name = "ACCOUNT_PASSWORD")
     private String accountPassword;
 
@@ -36,7 +30,7 @@ public class Account {
     @Column(name = "ACC_ONE_TIME_LIMIT")
     private Long accountOneTimeLimit;
 
-    @Column(name = "MONYE_AMOUNT", columnDefinition = "bigint default 0")
+    @Column(name = "MONEY_AMOUNT", columnDefinition = "bigint default 0")
     private Long moneyAmount = 0L;
 
     @Column(name = "GROUP_ACCOUNT_CODE")

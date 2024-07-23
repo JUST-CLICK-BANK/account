@@ -4,15 +4,14 @@ import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccount;
 import lombok.Builder;
 
-
 @Builder
 public record GroupAccountResponse(
-        String account,
-        String accountName,
-        Long moneyAmount,
-        String userProfileImg,
-        String userNickname,
-        Boolean accountDisable
+    String account,
+    String accountName,
+    Long moneyAmount,
+    String userProfileImg,
+    String userNickname,
+    Boolean accountDisable
 
 ) {
     public static GroupAccountResponse from(Account account, GroupAccount groupAccount) {

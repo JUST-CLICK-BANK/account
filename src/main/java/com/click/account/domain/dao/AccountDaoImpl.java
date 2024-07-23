@@ -1,7 +1,6 @@
 package com.click.account.domain.dao;
 
 import com.click.account.config.constants.TransferLimit;
-import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.account.GroupCode;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dto.request.*;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -52,7 +50,7 @@ public class AccountDaoImpl implements AccountDao {
         accountRepository.save(
             req.toGroupEntity(
                 account,
-                tokenInfo.name()+"의 통장",
+                tokenInfo.name()+"의 모임 통장",
                 user,
                 TransferLimit.getDailyLimit(),
                 TransferLimit.getOnetimeLimit(),

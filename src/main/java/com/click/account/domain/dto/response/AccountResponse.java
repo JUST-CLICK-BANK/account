@@ -5,9 +5,9 @@ import lombok.Builder;
 
 @Builder
 public record AccountResponse(
-        String account,
-        String accountName,
-        Long moneyAmount
+    String account,
+    String accountName,
+    Long moneyAmount
 ) {
 
     public static AccountResponse from(Account account) {
