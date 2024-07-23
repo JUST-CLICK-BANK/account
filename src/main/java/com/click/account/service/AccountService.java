@@ -13,6 +13,7 @@ import java.util.UUID;
 
 public interface AccountService {
     void saveAccount(TokenInfo tokenInfo, AccountRequest req);
+//    void saveGroupAccount(TokenInfo tokenInfo, AccountRequest req);
     void updateName(UUID userId, AccountNameRequest req);
     void updatePassword(UUID userId, AccountPasswordRequest req);
     void updateMoney(UUID userId, AccountMoneyRequest req);
