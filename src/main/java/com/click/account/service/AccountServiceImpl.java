@@ -1,5 +1,6 @@
 package com.click.account.service;
 
+import com.click.account.config.kafka.dto.KafkaStatus;
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
-
     private final AccountDao accountDao;
     private final GroupAccountDao groupAccountDao;
     private final AccountRepository accountRepository;
@@ -49,7 +49,9 @@ public class AccountServiceImpl implements AccountService {
             User user = userService.getUser(userId, tokenInfo);
             accountDao.saveGroupAccount(req, account, user);
             groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
-        }
+//            apiService.sendUserCode(user.getUserCode(), account);
+            apiService.sendUserCodeAndAccount(user.getUserCode(), account);
+       }
     }
 
     private String makeAccount() {

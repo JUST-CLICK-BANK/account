@@ -1,7 +1,7 @@
 package com.click.account.domain.repository;
 
 import com.click.account.domain.dto.request.GroupAccountRequest;
-import com.click.account.domain.entity.GroupAccount;
+import com.click.account.domain.entity.GroupAccountMember;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -35,7 +33,7 @@ class GroupAccountRepositoryTest {
                 img
         );
 
-        GroupAccount groupAccount = groupAccountRepository.save(request.toEntity(account));
+        GroupAccountMember groupAccount = groupAccountRepository.save(request.toEntity(account));
 
         Assertions.assertEquals(groupAccount.getAccount(), account);
         Assertions.assertEquals(groupAccount.getFriendId(), friendId);
@@ -54,7 +52,7 @@ class GroupAccountRepositoryTest {
                 img
         );
 
-        GroupAccount groupAccount = groupAccountRepository.save(request.toEntity(account));
+        GroupAccountMember groupAccount = groupAccountRepository.save(request.toEntity(account));
 
         Assertions.assertNotEquals(groupAccount.getAccount(), "111222333334");
         Assertions.assertNotEquals(groupAccount.getUserId(), UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff865"));
@@ -73,9 +71,9 @@ class GroupAccountRepositoryTest {
                 img
         );
 
-        GroupAccount groupAccount = groupAccountRepository.save(request.toEntity(account));
+        GroupAccountMember groupAccount = groupAccountRepository.save(request.toEntity(account));
 
-        Optional<GroupAccount> getGroupAccount = groupAccountRepository.findByAccountAndUserId(groupAccount.getAccount(), groupAccount.getUserId());
+        Optional<GroupAccountMember> getGroupAccount = groupAccountRepository.findByAccountAndUserId(groupAccount.getAccount(), groupAccount.getUserId());
 
         Assertions.assertTrue(getGroupAccount.isPresent());
         Assertions.assertEquals(getGroupAccount.get().getAccount(), groupAccount.getAccount());
@@ -97,7 +95,7 @@ class GroupAccountRepositoryTest {
 
         groupAccountRepository.save(request.toEntity(account));
 
-        Optional<GroupAccount> getGroupAccount = groupAccountRepository.findByAccountAndUserId("111222333334", UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff865"));
+        Optional<GroupAccountMember> getGroupAccount = groupAccountRepository.findByAccountAndUserId("111222333334", UUID.fromString("71a90366-30e6-4e7e-a259-01a7947ff865"));
 
         Assertions.assertFalse(getGroupAccount.isPresent());
     }
@@ -115,7 +113,7 @@ class GroupAccountRepositoryTest {
                 img
         );
 
-        GroupAccount groupAccount = groupAccountRepository.save(request.toEntity(account));
+        GroupAccountMember groupAccount = groupAccountRepository.save(request.toEntity(account));
 
         boolean checkAdmin = groupAccountRepository.existsByAccountAndAdminIsTrue(groupAccount.getAccount());
 

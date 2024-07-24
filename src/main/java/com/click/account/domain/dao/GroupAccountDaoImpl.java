@@ -1,8 +1,8 @@
 package com.click.account.domain.dao;
 
 import com.click.account.config.utils.jwt.TokenInfo;
-import com.click.account.domain.entity.GroupAccount;
-import com.click.account.domain.repository.GroupAccountRepository;
+import com.click.account.domain.entity.GroupAccountMember;
+import com.click.account.domain.repository.GroupAccountMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -11,16 +11,16 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class GroupAccountDaoImpl implements GroupAccountDao{
-    private final GroupAccountRepository groupAccountRepository;
+    private final GroupAccountMemberRepository groupAccountMemberRepository;
 
     @Override
     public void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId) {
-        boolean checkAdmin = !groupAccountRepository.existsByAccountAndAdminIsTrue(account);
+        boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(account);
 
-        groupAccountRepository.save(
-                GroupAccount.builder()
+        groupAccountMemberRepository.save(
+                GroupAccountMember.builder()
                         .account(account)
-                        .userId(userId)
+                        .userCode(tokenInfo.code())
                         .userNickName(tokenInfo.name())
                         .userPofileImg(tokenInfo.img())
                         .admin(checkAdmin)
