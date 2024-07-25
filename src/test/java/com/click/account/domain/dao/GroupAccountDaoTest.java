@@ -1,7 +1,7 @@
 package com.click.account.domain.dao;
 
 import com.click.account.config.utils.jwt.TokenInfo;
-import com.click.account.domain.entity.GroupAccount;
+import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.repository.GroupAccountRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +41,7 @@ class GroupAccountDaoTest {
         groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
 
         // then
-        Mockito.verify(groupAccountRepository).save(any(GroupAccount.class));
+        Mockito.verify(groupAccountRepository).save(any(GroupAccountMember.class));
     }
 
     @Test
@@ -59,7 +58,7 @@ class GroupAccountDaoTest {
         );
 
         Mockito.doThrow(new RuntimeException("Database error"))
-                .when(groupAccountRepository).save(any(GroupAccount.class));
+                .when(groupAccountRepository).save(any(GroupAccountMember.class));
 
         // when, then
         RuntimeException thrown = Assertions

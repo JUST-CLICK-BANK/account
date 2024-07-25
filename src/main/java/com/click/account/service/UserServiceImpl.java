@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserDao userDao;
 
     @Override
@@ -26,7 +25,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserInfo(TokenInfo tokenInfo) {
-
-        return UserResponse.from(tokenInfo.name(), tokenInfo.img());
+        return UserResponse.from(tokenInfo.name(), tokenInfo.img(), tokenInfo.code());
     }
 }

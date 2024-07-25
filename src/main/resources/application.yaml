@@ -7,8 +7,20 @@ spring:
     password: 1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: 35.184.106.163:9094
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      group-id: product
+      auto-offset-reset: earliest
 
 jwt:
   secret: thisispublickeythisispublickeythisispublickeythisispublickey
+
+kafka:
+  product:
+    name: friendship-topic

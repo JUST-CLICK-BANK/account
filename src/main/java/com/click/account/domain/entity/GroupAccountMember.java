@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Table(name = "GROUP_ACCOUNT_LISTS")
-public class GroupAccount {
+public class GroupAccountMember {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +29,9 @@ public class GroupAccount {
 
     @Column(name = "ADMIN")
     private Boolean admin;
+
+    @Column(name = "USER_CODE")
+    private String userCode;
 
     @Column(name = "USER_ID")
     private UUID userId;
