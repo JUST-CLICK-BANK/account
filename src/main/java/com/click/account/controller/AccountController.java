@@ -2,8 +2,12 @@ package com.click.account.controller;
 
 import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
-import com.click.account.domain.dto.request.*;
-import com.click.account.domain.dto.request.AccountRequest;
+import com.click.account.domain.dto.request.account.AccountMoneyRequest;
+import com.click.account.domain.dto.request.account.AccountNameRequest;
+import com.click.account.domain.dto.request.account.AccountPasswordRequest;
+import com.click.account.domain.dto.request.account.AccountRequest;
+import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
+import com.click.account.domain.dto.response.AccountDetailResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.service.AccountService;
@@ -30,16 +34,6 @@ public class AccountController {
 
     private final AccountService accountService;
     private final JwtUtils jwtUtils;
-
-    @PostMapping("/user")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void saveUser(
-        @RequestHeader("Authorization") String bearerToken
-    ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-
-    }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -119,6 +113,16 @@ public class AccountController {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return accountService.getAccountFromUserId(account, tokenInfo);
+    }
+
+    @GetMapping("/group")
+    public AccountDetailResponse getAccount(
+        @RequestHeader("Authorization") String bearerToken,
+        @RequestParam("account") String account
+    ) {
+        String token = bearerToken.substring(7);
+        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+        return accountService.getAccountInfo(tokenInfo, account);
     }
 
 }

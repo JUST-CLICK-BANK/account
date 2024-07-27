@@ -2,7 +2,7 @@ package com.click.account.domain.dao;
 
 import com.click.account.config.constants.TransferLimit;
 import com.click.account.config.utils.account.GroupCode;
-import com.click.account.domain.dto.request.*;
+import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.AccountRepository;
@@ -56,5 +56,11 @@ public class AccountDaoImpl implements AccountDao {
     public Account getAccount(String generatedAccount) {
         return accountRepository.findByAccount(generatedAccount)
             .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public void deleteAccount(Account account) {
+        account.setAccountDisable(false);
+        accountRepository.save(account);
     }
 }

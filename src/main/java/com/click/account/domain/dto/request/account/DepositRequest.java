@@ -1,4 +1,4 @@
-package com.click.account.domain.dto.request;
+package com.click.account.domain.dto.request.account;
 
 public record DepositRequest(
     String bhName,

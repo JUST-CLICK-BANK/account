@@ -1,7 +1,7 @@
 package com.click.account.config.apis;
 
-import com.click.account.domain.dto.request.DepositRequest;
-import com.click.account.domain.dto.request.WithdrawRequest;
+import com.click.account.domain.dto.request.account.DepositRequest;
+import com.click.account.domain.dto.request.account.WithdrawRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

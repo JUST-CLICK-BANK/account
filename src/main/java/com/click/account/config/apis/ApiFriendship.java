@@ -1,6 +1,8 @@
 package com.click.account.config.apis;
 
-import com.click.account.domain.dto.request.FriendshipRequest;
+import com.click.account.domain.dto.response.FriendResponse;
+import com.click.account.domain.entity.Friend;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -11,8 +13,8 @@ public class ApiFriendship {
     private final FeignFriendship feignFriendship;
 
     @Async
-    public void inviteFriend(String code, FriendshipRequest req) {
-        feignFriendship.inviteFriend(code, req);
+    public List<FriendResponse> inviteFriend(String code) {
+        return feignFriendship.inviteFriend(code);
     }
 
 }

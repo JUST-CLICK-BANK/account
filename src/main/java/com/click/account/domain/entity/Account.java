@@ -1,6 +1,7 @@
 package com.click.account.domain.entity;
 
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.*;
 
 @Entity
@@ -13,6 +14,9 @@ public class Account {
     @Id
     @Column(name = "ACCOUNT")
     private String account;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private List<GroupAccountMember> groupAccountMembers;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")

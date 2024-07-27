@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
+import org.apache.kafka.common.protocol.types.Field.Bool;
 
 @Entity
 @Getter
@@ -33,9 +34,17 @@ public class GroupAccountMember {
     @Column(name = "USER_CODE")
     private String userCode;
 
+    @Column(name = "STATUS")
+    private boolean status;
+
     @Column(name = "USER_ID")
     private UUID userId;
 
-    @Column(name = "ACCOUNT")
-    private String account;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ACCOUNT")
+    private Account account;
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
 }

@@ -1,9 +1,9 @@
 package com.click.account.domain.dao;
 
-import com.click.account.domain.dto.request.AccountNameRequest;
-import com.click.account.domain.dto.request.AccountPasswordRequest;
-import com.click.account.domain.dto.request.AccountRequest;
-import com.click.account.domain.dto.request.AccountTransferLimitRequest;
+import com.click.account.domain.dto.request.account.AccountNameRequest;
+import com.click.account.domain.dto.request.account.AccountPasswordRequest;
+import com.click.account.domain.dto.request.account.AccountRequest;
+import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
 import org.junit.jupiter.api.Assertions;
