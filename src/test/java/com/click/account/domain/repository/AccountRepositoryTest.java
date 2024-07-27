@@ -1,6 +1,6 @@
 package com.click.account.domain.repository;
 
-import com.click.account.domain.dto.request.AccountRequest;
+import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.entity.Account;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

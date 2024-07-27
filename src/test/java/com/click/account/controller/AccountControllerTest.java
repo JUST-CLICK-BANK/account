@@ -1,15 +1,12 @@
 package com.click.account.controller;
 
-import com.click.account.domain.dto.request.AccountRequest;
-import com.click.account.service.AccountService;
+import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.service.AccountServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,7 +18,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(AccountController.class)

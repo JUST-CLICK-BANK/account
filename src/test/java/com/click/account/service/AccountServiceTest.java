@@ -4,7 +4,7 @@ import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
-import com.click.account.domain.dto.request.AccountRequest;
+import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.repository.AccountRepository;
 import com.click.account.domain.repository.GroupAccountRepository;
