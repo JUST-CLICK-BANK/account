@@ -35,7 +35,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final ApiService apiService;
     private final UserService userService;
-    private final FriendRepository friendRepository;
+    private final FriendService friendService;
     private final GroupAccountMemberService groupAccountMemberService;
 
     @Override
@@ -48,17 +48,15 @@ public class AccountServiceImpl implements AccountService {
 
         // 일반 계좌 생성
         if (req.accountStatus().equals("account")) {
-            User user = userService.getUser(userId, tokenInfo);
+            User user = userService.getUser(tokenInfo);
             accountDao.saveAccount(req, account, user);
             return;
         }
 
         // 모임 통장 계좌 생성
         if (req.accountStatus().equals("group")) {
-            User user = userService.getUser(userId, tokenInfo);
-            List<Friend> friendResponses = apiService.getFriendsInfo(user.getUserCode(), account);
-            if (friendResponses.isEmpty()) throw new IllegalArgumentException();
-            friendRepository.saveAll(friendResponses);
+            User user = userService.getUser(tokenInfo);
+            friendService.save(user.getUserCode(), account);
             accountDao.saveGroupAccount(req, account, user);
             groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
        }
@@ -70,6 +68,36 @@ public class AccountServiceImpl implements AccountService {
             return makeAccount();
         }
         return account;
+    }
+
+    @Override
+    public List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId, TokenInfo tokenInfo) {
+        List<Account> disabledAccount = accountRepository.findAccounts(userId,true);
+        if (disabledAccount.isEmpty()) {
+            return List.of();
+        }
+        List<AccountResponse> accountResponses = disabledAccount.stream()
+            .map(AccountResponse::from)
+            .collect(Collectors.toList());
+
+        return List.of(UserAccountResponse.from(accountResponses, tokenInfo));
+    }
+
+    @Override
+    public AccountUserInfo getAccountFromUserId(String requestAccount, TokenInfo tokenInfo) {
+        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
+        Account account = accountDao.getAccount(requestAccount);
+        return AccountUserInfo.from(account, account.getUser().getUserId().toString());
+    }
+
+    @Override
+    public AccountDetailResponse getAccountInfo(TokenInfo tokenInfo, String reqAccount) {
+        if (reqAccount == null) throw new IllegalArgumentException("계좌가 존재하지 않습니다.");
+        Account account = accountDao.getAccount(reqAccount);
+
+        List<GroupAccountMemberResponse> groupAccountMemberResponses = groupAccountMemberService.getGroupAccountMember(account);
+
+        return AccountDetailResponse.from(account, groupAccountMemberResponses);
     }
 
     @Override
@@ -105,6 +133,7 @@ public class AccountServiceImpl implements AccountService {
         // 출금한 경우
         if (req.accountStatus().equals("transfer")) {
             if (account.getMoneyAmount() <= 0) throw new IllegalArgumentException("잔액이 부족합니다.");
+            if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new IllegalArgumentException("한도를 초과하셨습니다.");
             long money = account.getMoneyAmount()  - req.moneyAmount();
             account.updateMoney(money);
             apiService.sendWithdraw(req, account);
@@ -120,41 +149,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo) {
-        List<Account> disabledAccount = accountRepository.findAccounts(userId,true);
-        if (disabledAccount.isEmpty()) {
-            return List.of();
-        }
-        List<AccountResponse> accountResponses = disabledAccount.stream()
-                .map(AccountResponse::from)
-                .collect(Collectors.toList());
-
-        return List.of(UserAccountResponse.from(accountResponses, tokenInfo));
-    }
-
-    @Override
-    public void deleteAccount(UUID userId, String account) {
-        Account delete = accountRepository.findUserIdAndAccount(userId, account)
+    public void deleteAccount(UUID userId, String reqAccount) {
+        Account account = accountRepository.findUserIdAndAccount(userId, reqAccount)
             .orElseThrow(IllegalArgumentException::new);
-        delete.setAccountDisable(false);
-        accountRepository.save(delete);
-    }
-
-    @Override
-    public AccountUserInfo getAccountFromUserId(String requestAccount, TokenInfo tokenInfo) {
-        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
-        Account account = accountDao.getAccount(requestAccount);
-        return AccountUserInfo.from(account);
-    }
-
-    @Override
-    public AccountDetailResponse getAccountInfo(TokenInfo tokenInfo, String reqAccount) {
-        if (reqAccount == null) throw new IllegalArgumentException("계좌가 존재하지 않습니다.");
-        Account account = accountDao.getAccount(reqAccount);
-
-        List<GroupAccountMemberResponse> groupAccountMemberResponses = groupAccountMemberService.getGroupAccountMember(account);
-
-        return AccountDetailResponse.from(account, groupAccountMemberResponses);
+        account.setAccountDisable(false);
+        accountRepository.save(account);
     }
 }
 

@@ -54,7 +54,7 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
 
     @Override
     public void delete(TokenInfo tokenInfo, String reqAccount) {
-        if (tokenInfo.id() == null && reqAccount == null) throw new IllegalArgumentException();
+        if (tokenInfo.id() == null || reqAccount == null || reqAccount.isEmpty()) throw new IllegalArgumentException();
         Account account = accountDao.getAccount(reqAccount);
         if (account.getGroupAccountMembers().size() <= 1) accountDao.deleteAccount(account);
         groupAccountDao.deleteGroupMember(tokenInfo.code(), account);

@@ -14,17 +14,18 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
     @Override
-    public User getUser(UUID userId, TokenInfo tokenInfo) {
-        User user;
-        if(userDao.getUser(userId).isPresent()) {
-            user = userDao.getUser(userId).get();
-        } else user = userDao.save(userId, tokenInfo);
-        System.out.println(user.getUserCode());
-        return user;
+    public User getUser(TokenInfo tokenInfo) {
+        UUID userId = UUID.fromString(tokenInfo.id());
+        return userDao.getUser(userId)
+            .orElseGet(() -> userDao.save(userId, tokenInfo));
     }
 
     @Override
     public UserResponse getUserInfo(TokenInfo tokenInfo) {
-        return UserResponse.from(tokenInfo.name(), tokenInfo.img(), tokenInfo.code());
+        return UserResponse.from(
+            tokenInfo.name(),
+            tokenInfo.img(),
+            tokenInfo.code()
+        );
     }
 }

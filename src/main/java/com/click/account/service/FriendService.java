@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface FriendService {
     List<FriendResponse> getFriends(TokenInfo tokenInfo, String account);
-//    void save(TokenInfo tokenInfo, String account, List<Friend> friends);
+    void save(String code, String account);
 }
