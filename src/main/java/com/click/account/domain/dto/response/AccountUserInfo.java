@@ -8,9 +8,9 @@ public record AccountUserInfo(
     String nickName,
     Long amount
 ) {
-    public static AccountUserInfo from(Account account) {
+    public static AccountUserInfo from(Account account, String userId) {
         return new AccountUserInfo(
-            account.getUser().getUserId().toString(),
+            userId,
             account.getAccount(),
             account.getUser().getUserNickName(),
             account.getMoneyAmount()

@@ -10,6 +10,14 @@ public record DepositRequest(
     Long categoryId
 ) {
     public static DepositRequest toTranfer(AccountMoneyRequest req, String bhName, Long bhBalance) {
-        return new DepositRequest(bhName, req.moneyAmount(), req.account(), req.transferAccount(), "입금", bhBalance, req.category());
+        return new DepositRequest(
+            bhName,
+            req.moneyAmount(),
+            req.account(),
+            req.transferAccount(),
+            "입금",
+            bhBalance,
+            req.category()
+        );
     }
 }

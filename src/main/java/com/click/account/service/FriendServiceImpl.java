@@ -24,9 +24,10 @@ public class FriendServiceImpl implements FriendService {
         return friends.stream().map(FriendResponse::from).collect(Collectors.toList());
     }
 
-//    @Override
-//    public void save(TokenInfo tokenInfo, String account, List<Friend> requests) {
-//        List<Friend> friends = new ArrayList<>();
-//        friendRepository.saveAll(friends);
-//    }
+    @Override
+    public void save(String code, String account) {
+        List<Friend> friendResponses = apiService.getFriendsInfo(code, account);
+        if (friendResponses.isEmpty()) throw new IllegalArgumentException();
+        friendRepository.saveAll(friendResponses);
+    }
 }

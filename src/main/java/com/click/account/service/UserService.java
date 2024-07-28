@@ -6,6 +6,6 @@ import com.click.account.domain.entity.User;
 import java.util.UUID;
 
 public interface UserService {
-    User getUser(UUID userId, TokenInfo tokenInfo);
+    User getUser(TokenInfo tokenInfo);
     UserResponse getUserInfo(TokenInfo tokenInfo);
 }

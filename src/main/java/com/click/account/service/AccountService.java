@@ -16,12 +16,12 @@ import java.util.UUID;
 public interface AccountService {
     void saveAccount(TokenInfo tokenInfo, AccountRequest req);
 //    void saveGroupAccount(TokenInfo tokenInfo, AccountRequest req);
+    List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo);
+    AccountUserInfo getAccountFromUserId(String account, TokenInfo tokenInfo);
+    AccountDetailResponse getAccountInfo(TokenInfo tokenInfo, String account);
     void updateName(UUID userId, AccountNameRequest req);
     void updatePassword(UUID userId, AccountPasswordRequest req);
     void updateMoney(UUID userId, AccountMoneyRequest req);
     void updateAccountLimit(UUID userId, AccountTransferLimitRequest req);
     void deleteAccount(UUID userId,String account);
-    List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo);
-    AccountUserInfo getAccountFromUserId(String account, TokenInfo tokenInfo);
-    AccountDetailResponse getAccountInfo(TokenInfo tokenInfo, String account);
 }
