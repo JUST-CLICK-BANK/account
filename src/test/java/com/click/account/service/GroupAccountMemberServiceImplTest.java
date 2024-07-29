@@ -167,15 +167,39 @@ class GroupAccountMemberServiceImplTest {
         Account account = Account.builder()
             .groupAccountMembers(members)
             .build();
+        List<GroupAccountMember> groupAccountMember = List.of(
+            new GroupAccountMember(
+                null,
+                tokenInfo.img(),
+                tokenInfo.name(),
+                false,
+                tokenInfo.code(),
+                true,
+                UUID.fromString(tokenInfo.id()),
+                account
+            ),
+            new GroupAccountMember(
+                null,
+                tokenInfo.img(),
+                tokenInfo.name(),
+                false,
+                tokenInfo.code(),
+                true,
+                UUID.fromString(tokenInfo.id()),
+                account
+            )
+        );
 
         when(accountDao.getAccount(reqAccount)).thenReturn(account);
+        when(groupAccountDao.getGroupAccountStatusIsTrue(account)).thenReturn(1L);
+        when(groupAccountDao.getGroupAccountMemberFromStatusIsTrue(tokenInfo.code(), account)).thenReturn(groupAccountMember);
 
         // when
         groupAccountMemberService.delete(tokenInfo, reqAccount);
 
         // then
         verify(accountDao, times(1)).getAccount(reqAccount);
-        verify(groupAccountDao, times(1)).deleteGroupMember(tokenInfo.code(), account);
+        verify(groupAccountDao, times(1)).deleteGroupMember(groupAccountMember);
     }
 
     @Test
@@ -202,14 +226,26 @@ class GroupAccountMemberServiceImplTest {
         Account account = Account.builder()
             .groupAccountMembers(members)
             .build();
+        GroupAccountMember groupAccountMember = new GroupAccountMember(
+            null,
+            tokenInfo.img(),
+            tokenInfo.name(),
+            false,
+            tokenInfo.code(),
+            false,
+            UUID.fromString(tokenInfo.id()),
+            account
+        );
 
         when(accountDao.getAccount(reqAccount)).thenReturn(account);
+        when(groupAccountDao.getGroupAccountStatusIsTrue(account)).thenReturn(1L);
+        when(groupAccountDao.getGroupAccountMemberFromStatusIsTrue(tokenInfo.code(), account)).thenReturn(groupAccountMember);
 
         // when
         groupAccountMemberService.delete(tokenInfo, reqAccount);
 
         // then
         verify(accountDao, times(1)).deleteAccount(account);
-        verify(groupAccountDao, times(1)).deleteGroupMember(tokenInfo.code(), account);
+        verify(groupAccountDao, times(1)).deleteGroupMember(groupAccountMember);
     }
 }

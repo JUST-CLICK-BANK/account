@@ -112,7 +112,7 @@ public class AccountServiceImpl implements AccountService {
     public void updatePassword(UUID userId, AccountPasswordRequest req) {
         if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(req.account());
-        account.updateName(req.accountPassword());
+        account.updatePassword(req.accountPassword());
     }
 
     @Override
