@@ -14,5 +14,7 @@ public interface GroupAccountDao {
     void waitGroupAccountUser(List<GroupAccountMember> groupAccountMembers);
     List<GroupAccountMember> getGroupAccountMember(Account account);
     List<GroupAccountMember> getGroupAccountMemberFromUserId(UUID userId);
-    void deleteGroupMember(String userCode, Account account);
+    GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account);
+    long getGroupAccountStatusIsTrue(Account account);
+    void deleteGroupMember(GroupAccountMember groupAccountMember);
 }
