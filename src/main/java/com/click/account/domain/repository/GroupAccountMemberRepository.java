@@ -12,6 +12,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface GroupAccountMemberRepository extends JpaRepository<GroupAccountMember, Long> {
     boolean existsByAccountAndAdminIsTrue(Account account);
     List<GroupAccountMember> findByAccountAndStatusIsTrue(Account account);
-    Optional<GroupAccountMember> findByUserCodeAndAccount(String userCode, Account account);
+    Optional<GroupAccountMember> findByUserCodeAndAccountAndStatusIsTrue(String userCode, Account account);
     List<GroupAccountMember> findByUserIdAndStatus(UUID userId, Boolean status);
 }

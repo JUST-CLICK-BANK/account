@@ -19,11 +19,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GroupAccountDaoImpl implements GroupAccountDao{
     private final GroupAccountMemberRepository groupAccountMemberRepository;
-    private final AccountRepository accountRepository;
+    private final AccountDao accountDao;
 
     @Override
     public void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId) {
-        Account getAccount = accountRepository.findByAccount(account).orElseThrow(IllegalArgumentException::new);
+        Account getAccount = accountDao.getAccount(account);
+        // 있으면 status 값만 바꿔서 저장 없으면 저장하는 로직 필요
         boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(getAccount);
         log.info("{}", checkAdmin);
 
@@ -57,9 +58,22 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public void deleteGroupMember(String userCode, Account account) {
-        GroupAccountMember groupAccountMember = groupAccountMemberRepository.findByUserCodeAndAccount(userCode, account)
+    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(
+        String userCode,
+        Account account
+    ) {
+        return groupAccountMemberRepository.findByUserCodeAndAccountAndStatusIsTrue(userCode, account)
             .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public long getGroupAccountStatusIsTrue(Account account) {
+        return groupAccountMemberRepository.findByAccountAndStatusIsTrue(account)
+            .stream().filter(GroupAccountMember::isStatus).count();
+    }
+
+    @Override
+    public void deleteGroupMember(GroupAccountMember groupAccountMember) {
         groupAccountMemberRepository.delete(groupAccountMember);
     }
 }

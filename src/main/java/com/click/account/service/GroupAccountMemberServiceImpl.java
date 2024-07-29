@@ -56,7 +56,8 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
     public void delete(TokenInfo tokenInfo, String reqAccount) {
         if (tokenInfo.id() == null || reqAccount == null || reqAccount.isEmpty()) throw new IllegalArgumentException();
         Account account = accountDao.getAccount(reqAccount);
-        if (account.getGroupAccountMembers().size() <= 1) accountDao.deleteAccount(account);
-        groupAccountDao.deleteGroupMember(tokenInfo.code(), account);
+        GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberFromStatusIsTrue(tokenInfo.code(), account);
+        if (groupAccountDao.getGroupAccountStatusIsTrue(account) <= 1) accountDao.deleteAccount(account);
+        groupAccountDao.deleteGroupMember(groupAccountMember);
     }
 }
