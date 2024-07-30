@@ -51,6 +51,7 @@ public class ApiServiceImpl implements ApiService {
                 .build();
             friends.add(friend);
         });
+        log.info(friends.toString());
 
         return friends;
     }
