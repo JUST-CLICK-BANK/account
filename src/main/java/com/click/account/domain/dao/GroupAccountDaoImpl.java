@@ -1,11 +1,8 @@
 package com.click.account.domain.dao;
 
 import com.click.account.config.utils.jwt.TokenInfo;
-import com.click.account.domain.dto.request.group.GroupAccountMemberRequest;
-import com.click.account.domain.dto.response.GroupAccountMemberResponse;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccountMember;
-import com.click.account.domain.repository.AccountRepository;
 import com.click.account.domain.repository.GroupAccountMemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +21,8 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     @Override
     public void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId) {
         Account getAccount = accountDao.getAccount(account);
-        // 있으면 status 값만 바꿔서 저장 없으면 저장하는 로직 필요
         boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(getAccount);
+
         log.info("{}", checkAdmin);
 
         groupAccountMemberRepository.save(
@@ -58,11 +55,14 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(
-        String userCode,
-        Account account
-    ) {
+    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account) {
         return groupAccountMemberRepository.findByUserCodeAndAccountAndStatusIsTrue(userCode, account)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account) {
+        return groupAccountMemberRepository.findByUserCodeAndAccount(userCode, account)
             .orElseThrow(IllegalArgumentException::new);
     }
 

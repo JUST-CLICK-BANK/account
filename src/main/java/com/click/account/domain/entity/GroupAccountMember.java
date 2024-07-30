@@ -37,6 +37,9 @@ public class GroupAccountMember {
     @Column(name = "STATUS")
     private boolean status;
 
+    @Column(name = "INVITE_CODE")
+    private String inviteCode;
+
     @Column(name = "USER_ID")
     private UUID userId;
 
