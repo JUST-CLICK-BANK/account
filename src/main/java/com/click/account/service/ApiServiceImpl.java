@@ -38,20 +38,19 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public List<Friend> getFriendsInfo(String userCode, String account) {
         log.info(userCode);
-        List<Friend> friends = new ArrayList<>();
 
         List<FriendResponse> friendResponses = apiFriendship.inviteFriend(userCode);
-        friendResponses.forEach(friendResponse -> {
-            Friend friend = Friend.builder()
+        List<Friend> friends = friendResponses.stream().map(friendResponse -> {
+            return Friend.builder()
                 .userId(friendResponse.id())
                 .userImg(friendResponse.img())
                 .userName(friendResponse.name())
                 .userCode(friendResponse.code())
                 .account(account)
                 .build();
-            friends.add(friend);
-        });
+        }).toList();
 
+        friends.forEach(friend -> log.info(friend.getUserCode()));
         return friends;
     }
 }
