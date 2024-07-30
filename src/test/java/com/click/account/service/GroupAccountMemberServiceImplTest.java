@@ -105,6 +105,7 @@ class GroupAccountMemberServiceImplTest {
                 false,
                 requests.get(0).code(),
                 false,
+                null,
                 requests.get(0).id(),
                 account
             )
@@ -131,9 +132,21 @@ class GroupAccountMemberServiceImplTest {
     @Test
     void 유저_모임_통장_대기_목록() {
         // given
-        List<GroupAccountMember> groupAccountMembers = List.of(new GroupAccountMember());
+        Account account = new Account();
+        GroupAccountMember groupAccountMember = GroupAccountMember
+            .builder()
+            .inviteCode("SIGYJ2")
+            .account(account)
+            .build();
+        List<GroupAccountMember> groupAccountMembers = List.of(groupAccountMember);
+        GroupAccountMember inviteMember = GroupAccountMember.builder()
+            .account(account)
+            .userCode("SIGYJ2")
+            .build();
 
         when(groupAccountDao.getGroupAccountMemberFromUserId(UUID.fromString(tokenInfo.id()))).thenReturn(groupAccountMembers);
+        when(groupAccountDao.getGroupAccountMemberFromStatusIsTrue(groupAccountMember.getInviteCode(), groupAccountMember.getAccount()))
+            .thenReturn(inviteMember);
 
         // when
         List<GroupAccountMemberResponse> responses = groupAccountMemberService.acceptGroupAccountMember(tokenInfo);
@@ -141,6 +154,7 @@ class GroupAccountMemberServiceImplTest {
         // then
         assertEquals(1, responses.size());
         verify(groupAccountDao, times(1)).getGroupAccountMemberFromUserId(UUID.fromString(tokenInfo.id()));
+        verify(groupAccountDao, times(1)).getGroupAccountMemberFromStatusIsTrue(groupAccountMember.getInviteCode(), groupAccountMember.getAccount());
     }
 
     @Test
@@ -176,6 +190,7 @@ class GroupAccountMemberServiceImplTest {
                 false,
                 tokenInfo.code(),
                 true,
+                null,
                 UUID.fromString(tokenInfo.id()),
                 account
             );
@@ -223,6 +238,7 @@ class GroupAccountMemberServiceImplTest {
             false,
             tokenInfo.code(),
             false,
+            null,
             UUID.fromString(tokenInfo.id()),
             account
         );

@@ -3,6 +3,7 @@ package com.click.account.controller;
 import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dto.request.group.GroupAccountMemberRequest;
+import com.click.account.domain.dto.request.group.GroupAccountMemberStatusRequest;
 import com.click.account.domain.dto.response.GroupAccountMemberResponse;
 import com.click.account.service.GroupAccountMemberService;
 import java.util.List;
@@ -28,11 +29,12 @@ public class GroupAccountMemberController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void saveGroup(
-        @RequestHeader("Authorization") String bearerToken
+        @RequestHeader("Authorization") String bearerToken,
+        @RequestBody GroupAccountMemberStatusRequest req
     ) {
         String token = bearerToken.substring(7);
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        groupAccountMemberService.save(tokenInfo);
+        groupAccountMemberService.save(tokenInfo, req.status());
     }
 
     @PostMapping("wait")
