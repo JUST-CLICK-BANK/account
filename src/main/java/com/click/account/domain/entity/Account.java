@@ -1,15 +1,8 @@
 package com.click.account.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import jakarta.persistence.*;
+import java.util.List;
+import lombok.*;
 
 @Entity
 @Getter
@@ -22,8 +15,12 @@ public class Account {
     @Column(name = "ACCOUNT")
     private String account;
 
-    @Column(name = "USER_ID")
-    private UUID userId;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    private List<GroupAccountMember> groupAccountMembers;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @Column(name = "ACCOUNT_PASSWORD")
     private String accountPassword;
@@ -37,12 +34,30 @@ public class Account {
     @Column(name = "ACC_ONE_TIME_LIMIT")
     private Long accountOneTimeLimit;
 
-    @Column(name = "MONYE_AMOUNT")
-    private Long moneyAmount;
+    @Column(name = "MONEY_AMOUNT", columnDefinition = "bigint default 0")
+    private Long moneyAmount = 0L;
 
     @Column(name = "GROUP_ACCOUNT_CODE")
     private String groupAccountCode;
 
     @Column(name = "ACCOUNT_DISABLE")
+    @Setter
     private Boolean accountDisable;
+
+    public void updateName(String accountName) {
+        this.accountName = accountName;
+    }
+
+    public void updateMoney(Long moneyAmount) {
+        this.moneyAmount = moneyAmount;
+    }
+
+    public void updatePassword(String accountPassword) {
+        this.accountPassword = accountPassword;
+    }
+
+    public void updateTransferLimit(Long accountDailyLimit, Long accountOneTimeLimit) {
+        this.accountDailyLimit = accountDailyLimit;
+        this.accountOneTimeLimit = accountOneTimeLimit;
+    }
 }
