@@ -167,7 +167,7 @@ class GroupAccountMemberServiceImplTest {
         Account account = Account.builder()
             .groupAccountMembers(members)
             .build();
-        List<GroupAccountMember> groupAccountMember = List.of(
+        GroupAccountMember groupAccountMember =
             new GroupAccountMember(
                 null,
                 tokenInfo.img(),
@@ -177,18 +177,8 @@ class GroupAccountMemberServiceImplTest {
                 true,
                 UUID.fromString(tokenInfo.id()),
                 account
-            ),
-            new GroupAccountMember(
-                null,
-                tokenInfo.img(),
-                tokenInfo.name(),
-                false,
-                tokenInfo.code(),
-                true,
-                UUID.fromString(tokenInfo.id()),
-                account
-            )
-        );
+            );
+
 
         when(accountDao.getAccount(reqAccount)).thenReturn(account);
         when(groupAccountDao.getGroupAccountStatusIsTrue(account)).thenReturn(1L);
