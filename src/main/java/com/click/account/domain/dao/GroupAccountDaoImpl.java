@@ -22,7 +22,6 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     public void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId) {
         Account getAccount = accountDao.getAccount(account);
         boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(getAccount);
-
         log.info("{}", checkAdmin);
 
         groupAccountMemberRepository.save(
