@@ -181,6 +181,7 @@ class GroupAccountMemberServiceImplTest {
         Account account = Account.builder()
             .groupAccountMembers(members)
             .build();
+
         GroupAccountMember groupAccountMember =
             new GroupAccountMember(
                 null,
@@ -193,7 +194,6 @@ class GroupAccountMemberServiceImplTest {
                 UUID.fromString(tokenInfo.id()),
                 account
             );
-
 
         when(accountDao.getAccount(reqAccount)).thenReturn(account);
         when(groupAccountDao.getGroupAccountStatusIsTrue(account)).thenReturn(1L);
