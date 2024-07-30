@@ -24,10 +24,16 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
 
     @Override
     // 친구 요청 승인 시 모임 통장에 저장할 로직
-    public void save(TokenInfo tokenInfo) {
-        Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id())).orElseThrow(IllegalArgumentException::new);
+    public void save(TokenInfo tokenInfo, Boolean status) {
+        Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id()))
+            .orElseThrow(IllegalArgumentException::new);
         Account account = accountDao.getAccount(friend.getAccount());
-        groupAccountDao.saveGroupToUser(tokenInfo, account.getAccount(), UUID.fromString(tokenInfo.id()));
+        if (!status) {
+            GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(
+                tokenInfo.code(), account
+            );
+            groupAccountDao.deleteGroupMember(groupAccountMember);
+        } else groupAccountDao.saveGroupToUser(tokenInfo, account.getAccount(), UUID.fromString(tokenInfo.id()));
     }
 
     @Override
