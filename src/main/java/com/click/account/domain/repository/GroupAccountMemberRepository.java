@@ -14,4 +14,5 @@ public interface GroupAccountMemberRepository extends JpaRepository<GroupAccount
     List<GroupAccountMember> findByAccountAndStatusIsTrue(Account account);
     Optional<GroupAccountMember> findByUserCodeAndAccountAndStatusIsTrue(String userCode, Account account);
     List<GroupAccountMember> findByUserIdAndStatus(UUID userId, Boolean status);
+    Optional<GroupAccountMember> findByUserCodeAndAccount(String userCode, Account account);
 }

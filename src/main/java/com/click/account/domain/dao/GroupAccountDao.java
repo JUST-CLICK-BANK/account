@@ -10,11 +10,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GroupAccountDao {
-    void saveGroupToUser(TokenInfo tokenInfo, String Account, UUID userId);
+    void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId);
     void waitGroupAccountUser(List<GroupAccountMember> groupAccountMembers);
     List<GroupAccountMember> getGroupAccountMember(Account account);
     List<GroupAccountMember> getGroupAccountMemberFromUserId(UUID userId);
     GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account);
+    GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account);
     long getGroupAccountStatusIsTrue(Account account);
     void deleteGroupMember(GroupAccountMember groupAccountMember);
 }

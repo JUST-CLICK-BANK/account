@@ -10,6 +10,7 @@ import com.click.account.domain.entity.Friend;
 import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.repository.FriendRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,8 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
     // 친구 요청 승인 시 모임 통장에 저장할 로직
     public void save(TokenInfo tokenInfo) {
         Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id())).orElseThrow(IllegalArgumentException::new);
-        groupAccountDao.saveGroupToUser(tokenInfo, friend.getAccount(), UUID.fromString(tokenInfo.id()));
+        Account account = accountDao.getAccount(friend.getAccount());
+        groupAccountDao.saveGroupToUser(tokenInfo, account.getAccount(), UUID.fromString(tokenInfo.id()));
     }
 
     @Override
@@ -39,10 +41,16 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
 
     @Override
     public List<GroupAccountMemberResponse> acceptGroupAccountMember(TokenInfo tokenInfo) {
-        List<GroupAccountMember> groupAccountMember = groupAccountDao.getGroupAccountMemberFromUserId(
+        List<GroupAccountMember> groupAccountMembers = groupAccountDao.getGroupAccountMemberFromUserId(
             UUID.fromString(tokenInfo.id())
         );
-        return groupAccountMember.stream().map(GroupAccountMemberResponse::from).toList();
+
+        return groupAccountMembers.stream()
+            .map(groupAccountMember -> groupAccountDao.getGroupAccountMemberFromStatusIsTrue(
+                    groupAccountMember.getInviteCode(), groupAccountMember.getAccount()))
+            .filter(Objects::nonNull)
+            .map(GroupAccountMemberResponse::from)
+            .toList();
     }
 
     @Override
