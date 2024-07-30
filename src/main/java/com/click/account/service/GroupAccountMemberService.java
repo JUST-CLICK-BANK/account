@@ -7,7 +7,7 @@ import com.click.account.domain.entity.Account;
 import java.util.List;
 
 public interface GroupAccountMemberService {
-    void save(TokenInfo tokenInfo);
+    void save(TokenInfo tokenInfo, Boolean status);
     void saveWaitingMember(TokenInfo tokenInfo, String account, List<GroupAccountMemberRequest> requests);
     List<GroupAccountMemberResponse> acceptGroupAccountMember(TokenInfo tokenInfo);
     List<GroupAccountMemberResponse> getGroupAccountMember(Account account);
