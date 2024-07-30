@@ -21,13 +21,16 @@ public class FriendServiceImpl implements FriendService {
         if(tokenInfo == null) throw new IllegalArgumentException("Not Found User");
 
         List<Friend> friends = friendRepository.findByAccount(account);
+        friends.forEach(friend -> System.out.println(friend.getUserCode()));
         return friends.stream().map(FriendResponse::from).collect(Collectors.toList());
     }
 
     @Override
     public void save(String code, String account) {
-        List<Friend> friendResponses = apiService.getFriendsInfo(code, account);
-        if (friendResponses.isEmpty()) throw new IllegalArgumentException();
-        friendRepository.saveAll(friendResponses);
+        List<Friend> friends = apiService.getFriendsInfo(code, account);
+        friends.forEach(friend -> System.out.println(friend.getAccount()));
+        if (friends.isEmpty()) throw new IllegalArgumentException();
+        List<Friend> test = friendRepository.saveAll(friends);
+        test.forEach(tes -> System.out.println(tes.getUserCode()));
     }
 }

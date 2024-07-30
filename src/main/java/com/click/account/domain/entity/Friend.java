@@ -18,11 +18,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "FRIENDS")
 public class Friend {
     @Id
-    @Column(name = "ACCOUNT")
-    private String account;
-
     @Column(name = "USER_ID")
     private UUID userId;
+
+    @Column(name = "ACCOUNT")
+    private String account;
 
     @Column(name = "USER_CODE")
     private String userCode;
