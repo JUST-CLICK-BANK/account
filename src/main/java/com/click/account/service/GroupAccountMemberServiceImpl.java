@@ -28,7 +28,6 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
         Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id()))
             .orElseThrow(IllegalArgumentException::new);
         Account account = accountDao.getAccount(friend.getAccount());
-
         GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(
             tokenInfo.code(), account
         );
