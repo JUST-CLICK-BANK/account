@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
             User user = userService.getUser(tokenInfo);
             friendService.save(user.getUserCode(), account);
             accountDao.saveGroupAccount(req, account, user);
-            groupAccountDao.saveGroupToUser(tokenInfo, account, userId);
+            groupAccountDao.saveGroupToUser(tokenInfo, account);
        }
     }
 

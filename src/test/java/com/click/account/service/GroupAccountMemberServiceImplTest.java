@@ -63,11 +63,12 @@ class GroupAccountMemberServiceImplTest {
     void 모임_통장_유저_저장_성공() {
         // given
         Friend friend = new Friend();
+        Boolean status = true;
 
         when(friendRepository.findById(UUID.fromString(tokenInfo.id()))).thenReturn(Optional.of(friend));
 
         // when
-        groupAccountMemberService.save(tokenInfo);
+        groupAccountMemberService.save(tokenInfo, status);
 
         // then
         verify(friendRepository, times(1)).findById(UUID.fromString(tokenInfo.id()));

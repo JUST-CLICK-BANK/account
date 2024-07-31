@@ -19,19 +19,26 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     private final AccountDao accountDao;
 
     @Override
-    public void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId) {
-        Account getAccount = accountDao.getAccount(account);
-        boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(getAccount);
+    public void save(GroupAccountMember groupAccountMember) {
+        groupAccountMemberRepository.save(groupAccountMember);
+    }
+
+    @Override
+    public void saveGroupToUser(TokenInfo tokenInfo, String reqAccount) {
+        Account account = accountDao.getAccount(reqAccount);
+        boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(account);
         log.info("{}", checkAdmin);
 
         groupAccountMemberRepository.save(
                 GroupAccountMember.builder()
-                        .account(getAccount)
+                        .account(account)
                         .userCode(tokenInfo.code())
                         .userNickName(tokenInfo.name())
                         .userPofileImg(tokenInfo.img())
                         .admin(checkAdmin)
                         .status(true)
+                        .inviteCode(account.getGroupAccountCode())
+                        .userId(UUID.fromString(tokenInfo.id()))
                         .build()
         );
     }
@@ -54,8 +61,14 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account) {
-        return groupAccountMemberRepository.findByUserCodeAndAccountAndStatusIsTrue(userCode, account)
+    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String inviteCode, Account account) {
+        return groupAccountMemberRepository.findByInviteCodeAndAccountAndStatusIsTrue(inviteCode, account)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account) {
+        return groupAccountMemberRepository.findByUserCodeAndAccount(userCode, account)
             .orElseThrow(IllegalArgumentException::new);
     }
 

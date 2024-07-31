@@ -12,7 +12,8 @@ public record GroupAccountMemberRequest(
     String img,
     String name
 ) {
-    public List<GroupAccountMember> toEntities(Account account) {
+
+    public List<GroupAccountMember> toEntities(Account account, String code) {
         List<GroupAccountMember> groupAccountMembers = new ArrayList<>();
         groupAccountMembers.add(GroupAccountMember.builder()
             .userId(id)
@@ -21,7 +22,9 @@ public record GroupAccountMemberRequest(
             .userNickName(name)
             .admin(false)
             .status(false)
+            .inviteCode(code)
             .account(account)
+            .inviteCode(account.getGroupAccountCode())
             .build()
         );
         return groupAccountMembers;
