@@ -27,7 +27,6 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     public void saveGroupToUser(TokenInfo tokenInfo, String reqAccount) {
         Account account = accountDao.getAccount(reqAccount);
         boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(account);
-
         log.info("{}", checkAdmin);
 
         groupAccountMemberRepository.save(
@@ -38,6 +37,8 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
                         .userPofileImg(tokenInfo.img())
                         .admin(checkAdmin)
                         .status(true)
+                        .inviteCode(account.getGroupAccountCode())
+                        .userId(UUID.fromString(tokenInfo.id()))
                         .build()
         );
     }
@@ -60,8 +61,14 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account) {
-        return groupAccountMemberRepository.findByUserCodeAndAccountAndStatusIsTrue(userCode, account)
+    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String inviteCode, Account account) {
+        return groupAccountMemberRepository.findByInviteCodeAndAccountAndStatusIsTrue(inviteCode, account)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account) {
+        return groupAccountMemberRepository.findByUserCodeAndAccount(userCode, account)
             .orElseThrow(IllegalArgumentException::new);
     }
 

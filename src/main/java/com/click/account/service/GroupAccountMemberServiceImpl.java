@@ -28,7 +28,6 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
         Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id()))
             .orElseThrow(IllegalArgumentException::new);
         Account account = accountDao.getAccount(friend.getAccount());
-
         GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(
             tokenInfo.code(), account
         );
@@ -46,7 +45,7 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
     public void saveWaitingMember(TokenInfo tokenInfo, String reqAccount, List<GroupAccountMemberRequest> requests) {
         Account account = accountDao.getAccount(reqAccount);
         List<GroupAccountMember> groupAccountMembers = requests.stream()
-            .flatMap(request -> request.toEntities(account, tokenInfo.code()).stream())
+            .flatMap(request -> request.toEntities(account, request.code()).stream())
             .toList();
         groupAccountDao.waitGroupAccountUser(groupAccountMembers);
     }
