@@ -24,6 +24,7 @@ public record GroupAccountMemberRequest(
             .status(false)
             .inviteCode(code)
             .account(account)
+            .inviteCode(account.getGroupAccountCode())
             .build()
         );
         return groupAccountMembers;
