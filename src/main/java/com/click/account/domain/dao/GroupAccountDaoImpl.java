@@ -19,14 +19,20 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     private final AccountDao accountDao;
 
     @Override
-    public void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId) {
-        Account getAccount = accountDao.getAccount(account);
-        boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(getAccount);
+    public void save(GroupAccountMember groupAccountMember) {
+        groupAccountMemberRepository.save(groupAccountMember);
+    }
+
+    @Override
+    public void saveGroupToUser(TokenInfo tokenInfo, String reqAccount) {
+        Account account = accountDao.getAccount(reqAccount);
+        boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(account);
+
         log.info("{}", checkAdmin);
 
         groupAccountMemberRepository.save(
                 GroupAccountMember.builder()
-                        .account(getAccount)
+                        .account(account)
                         .userCode(tokenInfo.code())
                         .userNickName(tokenInfo.name())
                         .userPofileImg(tokenInfo.img())

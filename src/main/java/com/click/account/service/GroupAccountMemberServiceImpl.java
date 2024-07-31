@@ -28,19 +28,25 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
         Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id()))
             .orElseThrow(IllegalArgumentException::new);
         Account account = accountDao.getAccount(friend.getAccount());
-        if (!status) {
-            GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(
-                tokenInfo.code(), account
-            );
+
+        GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(
+            tokenInfo.code(), account
+        );
+        if (groupAccountMember == null) {
+            groupAccountDao.saveGroupToUser(tokenInfo, account.getAccount());
+        } else if (!status) {
             groupAccountDao.deleteGroupMember(groupAccountMember);
-        } else groupAccountDao.saveGroupToUser(tokenInfo, account.getAccount(), UUID.fromString(tokenInfo.id()));
+        } else {
+            groupAccountMember.setStatus(true);
+            groupAccountDao.save(groupAccountMember);
+        }
     }
 
     @Override
     public void saveWaitingMember(TokenInfo tokenInfo, String reqAccount, List<GroupAccountMemberRequest> requests) {
         Account account = accountDao.getAccount(reqAccount);
         List<GroupAccountMember> groupAccountMembers = requests.stream()
-            .flatMap(request -> request.toEntities(account).stream())
+            .flatMap(request -> request.toEntities(account, tokenInfo.code()).stream())
             .toList();
         groupAccountDao.waitGroupAccountUser(groupAccountMembers);
     }
@@ -51,12 +57,15 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
             UUID.fromString(tokenInfo.id())
         );
 
-        return groupAccountMembers.stream()
+        List<GroupAccountMemberResponse> groupAccountMemberResponses =  groupAccountMembers.stream()
             .map(groupAccountMember -> groupAccountDao.getGroupAccountMemberFromStatusIsTrue(
                     groupAccountMember.getInviteCode(), groupAccountMember.getAccount()))
             .filter(Objects::nonNull)
             .map(GroupAccountMemberResponse::from)
             .toList();
+      
+        System.out.println(groupAccountMembers.get(0).toString());
+        return groupAccountMemberResponses;
     }
 
     @Override
@@ -70,7 +79,8 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
     public void delete(TokenInfo tokenInfo, String reqAccount) {
         if (tokenInfo.id() == null || reqAccount == null || reqAccount.isEmpty()) throw new IllegalArgumentException();
         Account account = accountDao.getAccount(reqAccount);
-        GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberFromStatusIsTrue(tokenInfo.code(), account);
+        GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(tokenInfo.code(), account);
+      
         if (groupAccountDao.getGroupAccountStatusIsTrue(account) <= 1) accountDao.deleteAccount(account);
         groupAccountDao.deleteGroupMember(groupAccountMember);
     }

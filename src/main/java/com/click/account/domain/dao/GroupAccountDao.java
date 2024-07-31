@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GroupAccountDao {
-    void saveGroupToUser(TokenInfo tokenInfo, String account, UUID userId);
+    void save(GroupAccountMember groupAccountMember);
+    void saveGroupToUser(TokenInfo tokenInfo, String account);
     void waitGroupAccountUser(List<GroupAccountMember> groupAccountMembers);
     List<GroupAccountMember> getGroupAccountMember(Account account);
     List<GroupAccountMember> getGroupAccountMemberFromUserId(UUID userId);
