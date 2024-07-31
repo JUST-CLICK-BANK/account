@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.jpa.repository.Query;
 
 public interface GroupAccountMemberRepository extends JpaRepository<GroupAccountMember, Long> {
     boolean existsByAccountAndAdminIsTrue(Account account);
     List<GroupAccountMember> findByAccountAndStatusIsTrue(Account account);
-    Optional<GroupAccountMember> findByUserCodeAndAccountAndStatusIsTrue(String userCode, Account account);
+    Optional<GroupAccountMember> findByInviteCodeAndAccountAndStatusIsTrue(String inviteCode, Account account);
     List<GroupAccountMember> findByUserIdAndStatus(UUID userId, Boolean status);
     Optional<GroupAccountMember> findByUserCodeAndAccount(String userCode, Account account);
 }

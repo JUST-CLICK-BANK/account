@@ -38,6 +38,8 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
                         .userPofileImg(tokenInfo.img())
                         .admin(checkAdmin)
                         .status(true)
+                        .inviteCode(account.getGroupAccountCode())
+                        .userId(UUID.fromString(tokenInfo.id()))
                         .build()
         );
     }
@@ -60,8 +62,8 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account) {
-        return groupAccountMemberRepository.findByUserCodeAndAccountAndStatusIsTrue(userCode, account)
+    public GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String inviteCode, Account account) {
+        return groupAccountMemberRepository.findByInviteCodeAndAccountAndStatusIsTrue(inviteCode, account)
             .orElseThrow(IllegalArgumentException::new);
     }
 
