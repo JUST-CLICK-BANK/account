@@ -12,6 +12,7 @@ public record GroupAccountMemberRequest(
     String img,
     String name
 ) {
+
     public List<GroupAccountMember> toEntities(Account account, String code) {
         List<GroupAccountMember> groupAccountMembers = new ArrayList<>();
         groupAccountMembers.add(GroupAccountMember.builder()

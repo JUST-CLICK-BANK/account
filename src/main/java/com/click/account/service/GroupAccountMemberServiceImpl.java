@@ -23,10 +23,12 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
     private final AccountDao accountDao;
 
     @Override
+    // 친구 요청 승인 시 모임 통장에 저장할 로직
     public void save(TokenInfo tokenInfo, Boolean status) {
         Friend friend = friendRepository.findById(UUID.fromString(tokenInfo.id()))
             .orElseThrow(IllegalArgumentException::new);
         Account account = accountDao.getAccount(friend.getAccount());
+
         GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(
             tokenInfo.code(), account
         );
@@ -61,7 +63,7 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
             .filter(Objects::nonNull)
             .map(GroupAccountMemberResponse::from)
             .toList();
-
+      
         System.out.println(groupAccountMembers.get(0).toString());
         return groupAccountMemberResponses;
     }
@@ -78,6 +80,7 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
         if (tokenInfo.id() == null || reqAccount == null || reqAccount.isEmpty()) throw new IllegalArgumentException();
         Account account = accountDao.getAccount(reqAccount);
         GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(tokenInfo.code(), account);
+      
         if (groupAccountDao.getGroupAccountStatusIsTrue(account) <= 1) accountDao.deleteAccount(account);
         groupAccountDao.deleteGroupMember(groupAccountMember);
     }
