@@ -26,14 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
-    private final JwtUtils jwtUtils;
 
     @GetMapping()
     public UserResponse getUser(
-        @RequestHeader("Authorization") String bearerToken
+        TokenInfo tokenInfo
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return userService.getUserInfo(tokenInfo);
     }
 }
