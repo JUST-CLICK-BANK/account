@@ -7,7 +7,8 @@ import com.click.account.domain.entity.User;
 public record AccountRequest(
         String accountStatus,
         String accountPassword,
-        SavingAccountReqeust savingAccountReqeust
+        TransferRequest transferRequest,
+        SavingRequest savingRequest
 ) {
     public Account toEntity(
             String account,

@@ -24,46 +24,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/accounts/group")
 public class GroupAccountMemberController {
     private final GroupAccountMemberService groupAccountMemberService;
-    private final JwtUtils jwtUtils;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void saveGroup(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestBody GroupAccountMemberStatusRequest req
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         groupAccountMemberService.save(tokenInfo, req.status());
     }
 
     @PostMapping("wait")
     public void waitMember(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestParam("account") String account,
         @RequestBody List<GroupAccountMemberRequest> requests
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         groupAccountMemberService.saveWaitingMember(tokenInfo, account, requests);
     }
 
     @GetMapping("/accept")
     public List<GroupAccountMemberResponse> acceptMember(
-        @RequestHeader("Authorization") String bearerToken
+        TokenInfo tokenInfo
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return groupAccountMemberService.acceptGroupAccountMember(tokenInfo);
     }
 
     @DeleteMapping
     public void delete(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestParam("account") String account
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         groupAccountMemberService.delete(tokenInfo, account);
     }
 }

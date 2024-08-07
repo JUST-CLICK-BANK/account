@@ -14,6 +14,7 @@ import com.click.account.domain.dto.request.account.AccountNameRequest;
 import com.click.account.domain.dto.request.account.AccountPasswordRequest;
 import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
+import com.click.account.domain.dto.request.account.SavingRequest;
 import com.click.account.domain.dto.response.AccountDetailResponse;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
@@ -41,6 +42,7 @@ public class AccountServiceImpl implements AccountService {
     private final UserService userService;
     private final FriendService friendService;
     private final TransferService transferService;
+    private final SavingAccountService savingAccountService;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
@@ -84,7 +86,8 @@ public class AccountServiceImpl implements AccountService {
                 true,
                 type
             );
-            transferService.save(account, req.savingAccountReqeust());
+            savingAccountService.save(req.savingRequest(), makeAccount);
+            transferService.save(account, req.transferRequest());
             accountDao.saveAccount(account);
         }
     }
