@@ -5,5 +5,4 @@ import com.click.account.domain.entity.Account;
 
 public interface TransferService {
     void save(Account account, TransferRequest req);
-
 }
