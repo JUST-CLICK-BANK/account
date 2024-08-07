@@ -1,5 +1,6 @@
 package com.click.account.config.utils.jwt;
 
+import com.click.account.domain.entity.User;
 import io.jsonwebtoken.Claims;
 
 import java.util.UUID;
@@ -19,5 +20,15 @@ public record TokenInfo(
                 claims.get("name", String.class),
                 claims.get("rank", Integer.class)
         );
+    }
+
+    public User toEntity() {
+        return User.builder()
+            .userId(UUID.fromString(id))
+            .userNickName(name)
+            .userPorfileImg(img)
+            .userCode(code)
+            .rank(rank)
+            .build();
     }
 }

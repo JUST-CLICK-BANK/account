@@ -16,8 +16,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(TokenInfo tokenInfo) {
         UUID userId = UUID.fromString(tokenInfo.id());
+        User user = tokenInfo.toEntity();
         return userDao.getUser(userId)
-            .orElseGet(() -> userDao.save(userId, tokenInfo));
+            .orElseGet(() -> userDao.save(user));
     }
 
     @Override

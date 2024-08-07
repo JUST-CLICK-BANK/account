@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FriendRepository extends JpaRepository<Friend, UUID> {
-    Optional<Friend> findById(UUID userId);
+    Optional<Friend> findById(UUID friendId);
     List<Friend> findByAccount(String account);
+    Friend findByAccountAndFriendId(String account, UUID userId);
 }

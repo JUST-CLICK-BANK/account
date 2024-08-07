@@ -52,17 +52,19 @@ class FriendServiceImplTest {
     void 친구_목록_읽기() {
         List<Friend> friends = List.of(
             new Friend(
-                account,
                 UUID.randomUUID(),
+                account,
                 "BHG1TY",
                 "",
+                1,
                 "김김김"
             ),
             new Friend(
-                account,
                 UUID.randomUUID(),
+                account,
                 "TY4R9I",
                 "",
+                1,
                 "이이이"
             )
         );
@@ -87,17 +89,19 @@ class FriendServiceImplTest {
     void 친구_저장_성공() {
         List<Friend> friends = List.of(
             new Friend(
-                account,
                 UUID.randomUUID(),
+                account,
                 "BHG1TY",
                 "",
+                1,
                 "김김김"
             ),
             new Friend(
-                account,
                 UUID.randomUUID(),
+                account,
                 "TY4R9I",
                 "",
+                1,
                 "이이이"
             )
         );

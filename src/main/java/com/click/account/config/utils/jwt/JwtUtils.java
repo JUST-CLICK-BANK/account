@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -27,5 +28,10 @@ public class JwtUtils {
             @Value("${jwt.secret}") String key
     ) {
         this.publicKey = Keys.hmacShaKeyFor(key.getBytes());
+    }
+
+    public boolean validateToken(String token, UserDetails userDetails) {
+        TokenInfo tokenInfo = parseUserToken(token);
+        return tokenInfo.name().equals(userDetails.getUsername());
     }
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public interface AccountService {
     void saveAccount(TokenInfo tokenInfo, AccountRequest req);
-//    void saveGroupAccount(TokenInfo tokenInfo, AccountRequest req);
+    Boolean checkAccount(String reqAccount);
     List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId,TokenInfo tokenInfo);
     AccountUserInfo getAccountFromUserId(String account, TokenInfo tokenInfo);
     AccountDetailResponse getAccountInfo(TokenInfo tokenInfo, String account);

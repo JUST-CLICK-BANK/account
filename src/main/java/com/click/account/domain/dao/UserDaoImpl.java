@@ -1,6 +1,5 @@
 package com.click.account.domain.dao;
 
-import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.UserRepository;
 import java.util.Optional;
@@ -20,28 +19,13 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User save(UUID userId, TokenInfo tokenInfo) {
-         User user = User.builder()
-            .userId(userId)
-            .userNickName(tokenInfo.name())
-            .userPorfileImg(tokenInfo.img())
-            .userCode(tokenInfo.code())
-            .rank(tokenInfo.rank())
-            .build();
-         return userRepository.save(user);
+    public User getUserFromUserCode(String userCode) {
+        return userRepository.findByUserCode(userCode).orElseThrow(IllegalArgumentException::new);
     }
 
     @Override
-    public User saveUser(UUID userId, TokenInfo tokenInfo) {
-        return userRepository.save(
-            User.builder()
-                .userId(userId)
-                .userNickName(tokenInfo.name())
-                .userPorfileImg(tokenInfo.img())
-                .userCode(tokenInfo.code())
-                .rank(tokenInfo.rank())
-                .build()
-        );
+    public User save(User user) {
+         return userRepository.save(user);
     }
 
 

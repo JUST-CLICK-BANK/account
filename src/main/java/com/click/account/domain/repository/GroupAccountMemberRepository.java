@@ -2,6 +2,7 @@ package com.click.account.domain.repository;
 
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccountMember;
+import com.click.account.domain.entity.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,6 +13,6 @@ public interface GroupAccountMemberRepository extends JpaRepository<GroupAccount
     boolean existsByAccountAndAdminIsTrue(Account account);
     List<GroupAccountMember> findByAccountAndStatusIsTrue(Account account);
     Optional<GroupAccountMember> findByInviteCodeAndAccountAndStatusIsTrue(String inviteCode, Account account);
-    List<GroupAccountMember> findByUserIdAndStatus(UUID userId, Boolean status);
-    Optional<GroupAccountMember> findByUserCodeAndAccount(String userCode, Account account);
+    List<GroupAccountMember> findByUserAndStatus(User user, Boolean status);
+    Optional<GroupAccountMember> findByUserAndAccount(User user, Account account);
 }

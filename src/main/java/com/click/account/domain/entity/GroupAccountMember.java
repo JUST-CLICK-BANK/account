@@ -22,17 +22,8 @@ public class GroupAccountMember {
     @Column(name = "FRIEND_ID")
     private Long friendId;
 
-    @Column(name = "USER_PROFILE_IMG")
-    private String userPofileImg;
-
-    @Column(name = "USER_NICK_NAME")
-    private String userNickName;
-
     @Column(name = "ADMIN")
     private Boolean admin;
-
-    @Column(name = "USER_CODE")
-    private String userCode;
 
     @Column(name = "STATUS")
     private boolean status;
@@ -40,11 +31,12 @@ public class GroupAccountMember {
     @Column(name = "INVITE_CODE")
     private String inviteCode;
 
-    @Column(name = "USER_ID")
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_CODE")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ACCOUNT")
+    @JoinColumn(name = "account_id")
     private Account account;
 
     public void setStatus(Boolean status) {
