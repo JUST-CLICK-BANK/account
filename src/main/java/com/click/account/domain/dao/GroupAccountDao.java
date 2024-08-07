@@ -1,22 +1,18 @@
 package com.click.account.domain.dao;
 
-import com.click.account.config.utils.jwt.TokenInfo;
-
-import com.click.account.domain.dto.request.group.GroupAccountMemberRequest;
-import com.click.account.domain.dto.response.GroupAccountMemberResponse;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccountMember;
+import com.click.account.domain.entity.User;
 import java.util.List;
-import java.util.UUID;
 
 public interface GroupAccountDao {
     void save(GroupAccountMember groupAccountMember);
-    void saveGroupToUser(TokenInfo tokenInfo, String account);
+    void saveGroupToUser(User user, Account account);
     void waitGroupAccountUser(List<GroupAccountMember> groupAccountMembers);
     List<GroupAccountMember> getGroupAccountMember(Account account);
-    List<GroupAccountMember> getGroupAccountMemberFromUserId(UUID userId);
-    GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String userCode, Account account);
-    GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account);
+    List<GroupAccountMember> getGroupAccountMemberFromUser(User user);
+    GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String groupCode, Account account);
+    GroupAccountMember getGroupAccountMemberStatusIsFalse(User user, Account account);
     long getGroupAccountStatusIsTrue(Account account);
     void deleteGroupMember(GroupAccountMember groupAccountMember);
 }

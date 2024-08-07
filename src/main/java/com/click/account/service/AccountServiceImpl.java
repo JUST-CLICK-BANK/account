@@ -1,6 +1,11 @@
 package com.click.account.service;
 
+import com.click.account.config.constants.AccountType;
+import com.click.account.config.exception.InsufficientAmountException;
+import com.click.account.config.exception.LimitTransferException;
+import com.click.account.config.exception.NotExistAccountException;
 import com.click.account.config.utils.account.GenerateAccount;
+import com.click.account.config.utils.account.GroupCode;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
@@ -11,10 +16,11 @@ import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.dto.response.AccountDetailResponse;
 import com.click.account.domain.dto.response.AccountResponse;
-import com.click.account.domain.dto.response.GroupAccountMemberResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
+import com.click.account.domain.dto.response.UserResponse;
 import com.click.account.domain.entity.Account;
+import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,30 +40,53 @@ public class AccountServiceImpl implements AccountService {
     private final ApiService apiService;
     private final UserService userService;
     private final FriendService friendService;
-    private final GroupAccountMemberService groupAccountMemberService;
+    private final TransferService transferService;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
-        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
-        UUID userId = UUID.fromString(tokenInfo.id());
+        User user = userService.getUser(tokenInfo);
+        Integer type = AccountType.fromString(req.accountStatus());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
-        String account = makeAccount();
+        String makeAccount = makeAccount();
 
         // 일반 계좌 생성
-        if (req.accountStatus().equals("account")) {
-            User user = userService.getUser(tokenInfo);
-            accountDao.saveAccount(req, account, user);
-            return;
+        if (type == 1) {
+            Account account = req.toEntity(
+                makeAccount,
+                user.getUserNickName()+"의 통장",
+                user,
+                true,
+                type
+            );
+            accountDao.saveAccount(account);
         }
-
         // 모임 통장 계좌 생성
-        if (req.accountStatus().equals("group")) {
-            User user = userService.getUser(tokenInfo);
-            friendService.save(user.getUserCode(), account);
-            accountDao.saveGroupAccount(req, account, user);
-            groupAccountDao.saveGroupToUser(tokenInfo, account);
+        else if (type == 2) {
+            friendService.save(user.getUserCode(), makeAccount);
+            Account account = req.toGroupEntity(
+                makeAccount,
+                user.getUserNickName()+"의 모임 통장",
+                user,
+                GroupCode.getGroupCode(),
+                true,
+                type
+            );
+            accountDao.saveAccount(account);
+            groupAccountDao.saveGroupToUser(user, account);
        }
+        // 적금 계좌 생성
+        else if (type == 3) {
+            Account account = req.toSavingEntity(
+                makeAccount,
+                user.getUserNickName()+"적금 통장",
+                user,
+                true,
+                type
+            );
+            transferService.save(account, req.savingAccountReqeust());
+            accountDao.saveAccount(account);
+        }
     }
 
     private String makeAccount() {
@@ -66,6 +95,13 @@ public class AccountServiceImpl implements AccountService {
             return makeAccount();
         }
         return account;
+    }
+
+    // 계좌 유효성 검증
+    public Boolean checkAccount(String reqAccount) {
+        Account account = accountDao.getAccount(reqAccount);
+        if (account == null) return false;
+        return true;
     }
 
     @Override
@@ -83,32 +119,33 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountUserInfo getAccountFromUserId(String requestAccount, TokenInfo tokenInfo) {
-        if (tokenInfo == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(requestAccount);
         return AccountUserInfo.from(account, account.getUser().getUserId().toString());
     }
 
     @Override
     public AccountDetailResponse getAccountInfo(TokenInfo tokenInfo, String reqAccount) {
-        if (reqAccount == null) throw new IllegalArgumentException("계좌가 존재하지 않습니다.");
         Account account = accountDao.getAccount(reqAccount);
 
-        List<GroupAccountMemberResponse> groupAccountMemberResponses = groupAccountMemberService.getGroupAccountMember(account);
+        List<UserResponse> userResponses = account.getGroupAccountMembers().stream()
+            .map(GroupAccountMember::getUser)
+            .distinct()
+            .map(user -> UserResponse.from(user.getUserNickName(), user.getUserPorfileImg(), user.getUserCode()))
+            .toList();
 
-        return AccountDetailResponse.from(account, groupAccountMemberResponses);
+        return AccountDetailResponse.from(account, userResponses);
     }
 
     @Override
     @Transactional
     public void updateName(UUID userId, AccountNameRequest req) {
-        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(req.account());
         account.updateName(req.accountName());
     }
 
     @Override
+    @Transactional
     public void updatePassword(UUID userId, AccountPasswordRequest req) {
-        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(req.account());
         account.updatePassword(req.accountPassword());
     }
@@ -116,10 +153,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
-        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(req.account());
 
-        if (account.getAccountOneTimeLimit() <= req.moneyAmount()) throw new IllegalArgumentException("1회 한도를 초과하였습니다.");
+        if (account.getAccountOneTimeLimit() <= req.moneyAmount()) throw new LimitTransferException(
+            account.getAccountOneTimeLimit());
 
         // 입금 받은 경우
         if (req.accountStatus().equals("deposit")) {
@@ -130,8 +167,10 @@ public class AccountServiceImpl implements AccountService {
 
         // 출금한 경우
         if (req.accountStatus().equals("transfer")) {
-            if (account.getMoneyAmount() <= 0) throw new IllegalArgumentException("잔액이 부족합니다.");
-            if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new IllegalArgumentException("한도를 초과하셨습니다.");
+            if (account.getMoneyAmount() <= 0) throw new InsufficientAmountException(req.moneyAmount());
+            // 일화 한도를 넘었을 경우 에러
+            if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new LimitTransferException(
+                account.getAccountOneTimeLimit());
             long money = account.getMoneyAmount()  - req.moneyAmount();
             account.updateMoney(money);
             apiService.sendWithdraw(req, account);
@@ -141,7 +180,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void updateAccountLimit(UUID userId, AccountTransferLimitRequest req) {
-        if (userId == null) throw new IllegalArgumentException("유효하지 않는 토큰입니다.");
         Account account = accountDao.getAccount(req.account());
         account.updateTransferLimit(req.accountDailyLimit(), req.accountOneTimeLimit());
     }
@@ -149,7 +187,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void deleteAccount(UUID userId, String reqAccount) {
         Account account = accountRepository.findUserIdAndAccount(userId, reqAccount)
-            .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(NotExistAccountException::new);
         account.setAccountDisable(false);
         accountRepository.save(account);
     }

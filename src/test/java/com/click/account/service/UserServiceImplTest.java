@@ -57,7 +57,7 @@ class UserServiceImplTest {
 
         // then
         verify(userDao, times(1)).getUser(userId);
-        verify(userDao, never()).save(any(UUID.class), any(TokenInfo.class));
+        verify(userDao, never()).save(any(User.class));
         assertEquals(user, result);
     }
 
@@ -66,14 +66,14 @@ class UserServiceImplTest {
         // given
         User newUser = User.builder().userCode(tokenInfo.code()).build();
         when(userDao.getUser(userId)).thenReturn(Optional.empty());
-        when(userDao.save(userId, tokenInfo)).thenReturn(newUser);
+        when(userDao.save(newUser)).thenReturn(newUser);
 
         // when
         User result = userService.getUser(tokenInfo);
 
         // then
         verify(userDao, times(1)).getUser(userId);
-        verify(userDao, times(1)).save(userId, tokenInfo);
+        verify(userDao, times(1)).save(newUser);
         assertEquals(newUser, result);
     }
 

@@ -11,10 +11,10 @@ public record FriendsRequest(
 ) {
     public Friend toEntity(String account) {
         return Friend.builder()
-            .userId(id)
-            .userCode(code)
-            .userImg(img)
-            .userName(name)
+            .friendId(id)
+            .friendCode(code)
+            .friendImg(img)
+            .friendName(name)
             .account(account)
             .build();
     }

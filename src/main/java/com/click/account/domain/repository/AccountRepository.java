@@ -13,7 +13,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     Optional<Account> findByAccount(String account);
 
-    @Query("SELECT a FROM Account a JOIN FETCH a.user u WHERE u.userId = :userId AND a.accountDisable = :accountDisable")
+    @Query("SELECT distinct a FROM Account a JOIN a.user u JOIN a.groupAccountMembers gam WHERE (u.userId = :userId OR gam.user.userId = :userId) AND a.accountDisable = :accountDisable")
     List<Account> findAccounts(@Param("userId") UUID userId, @Param("accountDisable") Boolean accountDisable);
 
     @Query("SELECT a FROM Account a JOIN FETCH a.user u WHERE u.userId = :userId AND a.account = :account")

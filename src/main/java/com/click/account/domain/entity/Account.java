@@ -12,10 +12,13 @@ import lombok.*;
 @Table(name = "ACCOUNTS")
 public class Account {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(name = "ACCOUNT")
     private String account;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account")
     private List<GroupAccountMember> groupAccountMembers;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,10 +38,14 @@ public class Account {
     private Long accountOneTimeLimit;
 
     @Column(name = "MONEY_AMOUNT", columnDefinition = "bigint default 0")
+    @Builder.Default
     private Long moneyAmount = 0L;
 
     @Column(name = "GROUP_ACCOUNT_CODE")
     private String groupAccountCode;
+
+    @Column(name = "ACCOUNT_TYPE")
+    private Integer type;
 
     @Column(name = "ACCOUNT_DISABLE")
     @Setter
@@ -59,5 +66,19 @@ public class Account {
     public void updateTransferLimit(Long accountDailyLimit, Long accountOneTimeLimit) {
         this.accountDailyLimit = accountDailyLimit;
         this.accountOneTimeLimit = accountOneTimeLimit;
+    }
+    public Account copyToFriend(User friend){
+        return Account.builder()
+            .account(account)
+            .user(friend)
+            .moneyAmount(moneyAmount)
+            .accountDailyLimit(accountDailyLimit)
+            .accountName(accountName)
+            .accountPassword(accountPassword)
+            .groupAccountCode(groupAccountCode)
+            .groupAccountMembers(groupAccountMembers)
+            .accountDisable(accountDisable)
+            .accountOneTimeLimit(accountOneTimeLimit)
+            .build();
     }
 }

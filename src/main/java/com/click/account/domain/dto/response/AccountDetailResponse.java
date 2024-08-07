@@ -7,14 +7,14 @@ public record AccountDetailResponse(
     String account,
     String accountName,
     String groupAccountCode,
-    List<GroupAccountMemberResponse> groupAccountMemberResponses
+    List<UserResponse> userResponses
 ) {
-    public static AccountDetailResponse from(Account account, List<GroupAccountMemberResponse> res) {
+    public static AccountDetailResponse from(Account account, List<UserResponse> userResponses) {
         return new AccountDetailResponse(
             account.getAccount(),
             account.getAccountName(),
             account.getGroupAccountCode(),
-            res
+            userResponses
         );
     }
 

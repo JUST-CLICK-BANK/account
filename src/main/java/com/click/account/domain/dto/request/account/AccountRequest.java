@@ -6,25 +6,26 @@ import com.click.account.domain.entity.User;
 
 public record AccountRequest(
         String accountStatus,
-        String accountPassword
+        String accountPassword,
+        SavingAccountReqeust savingAccountReqeust
 ) {
     public Account toEntity(
             String account,
             String accountName,
             User user,
-            Long accountDailyLimit,
-            Long accountOneTimeLimit,
-            boolean accountDisable
+            boolean accountDisable,
+            Integer type
     ) {
         return Account.builder()
                 .account(account)
                 .accountName(accountName)
                 .user(user)
                 .accountPassword(accountPassword)
-                .moneyAmount(0L)
-                .accountDailyLimit(accountDailyLimit)
-                .accountOneTimeLimit(accountOneTimeLimit)
+                .moneyAmount(10000000L)
+                .accountDailyLimit(1000000L)
+                .accountOneTimeLimit(1000000L)
                 .accountDisable(accountDisable)
+                .type(type)
                 .build();
     }
 
@@ -32,21 +33,37 @@ public record AccountRequest(
             String account,
             String accountName,
             User user,
-            Long accountDailyLimit,
-            Long accountOneTimeLimit,
             String groupAccountCode,
-            boolean accountDisable
+            boolean accountDisable,
+            Integer type
     ) {
         return Account.builder()
                 .account(account)
                 .user(user)
                 .accountPassword(accountPassword)
                 .accountName(accountName)
-                .moneyAmount(0L)
-                .accountDailyLimit(accountDailyLimit)
-                .accountOneTimeLimit(accountOneTimeLimit)
+                .accountDailyLimit(1000000L)
+                .accountOneTimeLimit(1000000L)
                 .accountDisable(accountDisable)
                 .groupAccountCode(groupAccountCode)
+                .type(type)
                 .build();
+    }
+
+    public Account toSavingEntity(
+        String account,
+        String accountName,
+        User user,
+        boolean accountDisable,
+        Integer type
+    ) {
+        return Account.builder()
+            .account(account)
+            .accountName(accountName)
+            .user(user)
+            .accountPassword(accountPassword)
+            .accountDisable(accountDisable)
+            .type(type)
+            .build();
     }
 }
