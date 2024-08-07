@@ -28,15 +28,4 @@ public class FriendController {
         TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return friendService.getFriends(tokenInfo, account);
     }
-
-//    @PostMapping
-//    public void saveFriends(
-//        @RequestHeader("Authorization") String bearerToken,
-//        @RequestParam("account") String account,
-//        @RequestBody List<FriendsRequest> requests
-//    ) {
-//        String token = bearerToken.substring(7);
-//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-//        friendService.save(tokenInfo, account, requests);
-//    }
 }

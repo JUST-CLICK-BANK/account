@@ -40,17 +40,15 @@ public class ApiServiceImpl implements ApiService {
         log.info(userCode);
 
         List<FriendResponse> friendResponses = apiFriendship.inviteFriend(userCode);
-        List<Friend> friends = friendResponses.stream().map(friendResponse -> {
-            return Friend.builder()
-                .userId(friendResponse.id())
-                .userImg(friendResponse.img())
-                .userName(friendResponse.name())
-                .userCode(friendResponse.code())
-                .account(account)
-                .build();
-        }).toList();
 
-        friends.forEach(friend -> log.info(friend.getUserCode()));
-        return friends;
+        return friendResponses.stream().map(friendResponse ->
+             Friend.builder()
+                 .friendId(friendResponse.id())
+                .friendImg(friendResponse.img())
+                .friendName(friendResponse.name())
+                .friendCode(friendResponse.code())
+                .account(account)
+                .build())
+            .toList();
     }
 }

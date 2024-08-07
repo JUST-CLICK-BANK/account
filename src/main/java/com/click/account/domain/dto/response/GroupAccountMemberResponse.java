@@ -1,19 +1,17 @@
 package com.click.account.domain.dto.response;
 
 import com.click.account.domain.entity.GroupAccountMember;
+import com.click.account.domain.entity.User;
 
 public record GroupAccountMemberResponse(
-    String userName,
-    String userImg,
-    String userCode,
-    Boolean admin
+    User user
 ) {
-    public static GroupAccountMemberResponse from(GroupAccountMember groupAccountMember) {
+    public static GroupAccountMemberResponse from(User user) {
         return new GroupAccountMemberResponse(
-            groupAccountMember.getUserNickName(),
-            groupAccountMember.getUserPofileImg(),
-            groupAccountMember.getUserCode(),
-            groupAccountMember.getAdmin()
-        );
+            User.builder()
+                .userCode(user.getUserCode())
+                .userPorfileImg(user.getUserPorfileImg())
+                .userNickName(user.getUserNickName())
+                .build());
     }
 }

@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: account
@@ -7,7 +10,7 @@ spring:
     password: 1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
 
 jwt:

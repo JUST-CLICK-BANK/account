@@ -7,14 +7,16 @@ public record FriendResponse(
     UUID id,
     String code,
     String img,
-    String name
+    String name,
+    Integer rank
 ) {
     public static FriendResponse from(Friend friend) {
         return new FriendResponse(
-            friend.getUserId(),
-            friend.getUserCode(),
-            friend.getUserImg(),
-            friend.getUserName()
+            friend.getFriendId(),
+            friend.getFriendCode(),
+            friend.getFriendImg(),
+            friend.getFriendName(),
+            friend.getFriendRank()
         );
     }
 }

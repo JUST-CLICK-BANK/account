@@ -20,8 +20,6 @@ public record GroupAccountResponse(
                 .accountName(account.getAccountName())
                 .moneyAmount(account.getMoneyAmount())
                 .accountDisable(account.getAccountDisable())
-                .userProfileImg(groupAccount != null ? groupAccount.getUserPofileImg() : null)
-                .userNickname(groupAccount != null ? groupAccount.getUserNickName() : null)
                 .build();
 
     }

@@ -54,9 +54,6 @@ class AccountServiceTest {
     @Mock
     private GroupAccountDao groupAccountDao;
 
-    @Mock
-    private GroupAccountMemberService groupAccountMemberService;
-
     @InjectMocks
     private AccountServiceImpl accountService;
 
@@ -70,8 +67,7 @@ class AccountServiceTest {
             accountRepository,
             apiService,
             userService,
-            friendService,
-            groupAccountMemberService
+            friendService
         );
         tokenInfo = new TokenInfo(
             "bfa974e2-817c-4da3-bd46-d841ffb7b17a",
@@ -87,25 +83,26 @@ class AccountServiceTest {
         // given
         User user = new User();
         UUID userId = UUID.fromString(tokenInfo.id());
-        String account = "416111222";
+        String reqAccount = "416111222";
         AccountRequest req = new AccountRequest(
             "account",
             "1111"
         );
+        Account account = new Account();
 
         MockedStatic<GenerateAccount> mockedStatic = Mockito.mockStatic(GenerateAccount.class);
-        when(GenerateAccount.generateAccount()).thenReturn(account);
+        when(GenerateAccount.generateAccount()).thenReturn(reqAccount);
         when(userService.getUser(any(TokenInfo.class))).thenReturn(user);
-        when(accountDao.compareAccount(account)).thenReturn(false);
-        doNothing().when(accountDao).saveAccount(req, account, user);
+        when(accountDao.compareAccount(reqAccount)).thenReturn(false);
+        doNothing().when(accountDao).saveAccount(account);
 
         // when
         accountService.saveAccount(tokenInfo, req);
 
         // then
         mockedStatic.verify(GenerateAccount::generateAccount, times(1));
-        verify(accountDao, times(1)).compareAccount(account);
-        verify(accountDao, times(1)).saveAccount(req, account, user);
+        verify(accountDao, times(1)).compareAccount(reqAccount);
+        verify(accountDao, times(1)).saveAccount(account);
     }
 
     @Test
@@ -113,21 +110,22 @@ class AccountServiceTest {
         // given
         User user = new User();
         AccountRequest req = new AccountRequest("group", "0123");
-        String account = "111222333333";
+        String reqAccount = "111222333333";
+        Account account = new Account();
 
         MockedStatic<GenerateAccount> mockedStatic = Mockito.mockStatic(GenerateAccount.class);
-        when(GenerateAccount.generateAccount()).thenReturn(account);
+        when(GenerateAccount.generateAccount()).thenReturn(reqAccount);
         when(userService.getUser(any(TokenInfo.class))).thenReturn(user);
         when(accountDao.compareAccount(anyString())).thenReturn(false);
-        doNothing().when(accountDao).saveGroupAccount(req, account, user);
+        doNothing().when(accountDao).saveAccount(account);
 
         // when
         accountService.saveAccount(tokenInfo, req);
 
         // then
         mockedStatic.verify(GenerateAccount::generateAccount, times(1));
-        verify(accountDao, times(1)).saveGroupAccount(any(AccountRequest.class), anyString(), any(User.class));
-        verify(groupAccountDao, times(1)).saveGroupToUser(any(TokenInfo.class), anyString(), any(UUID.class));
+        verify(accountDao, times(1)).saveAccount(any(Account.class));
+        verify(groupAccountDao, times(1)).saveGroupToUser(any(User.class), any(Account.class));
     }
 
     @Test
@@ -150,9 +148,7 @@ class AccountServiceTest {
 
         Mockito.verify(accountDao).compareAccount(generatedAccount);
         Mockito.verify(accountDao, never())
-            .saveAccount(any(AccountRequest.class), anyString(), any(User.class));
-        Mockito.verify(accountDao, never())
-            .saveGroupAccount(any(AccountRequest.class), anyString(), any(User.class));
+            .saveAccount(any(Account.class));
     }
 
     @Test
@@ -197,6 +193,7 @@ class AccountServiceTest {
             null
         );
         Account account = new Account(
+            null,
             requestAccount,
             null,
             user,
@@ -227,29 +224,6 @@ class AccountServiceTest {
 
         // then
         Assertions.assertThrows(IllegalArgumentException.class, () -> accountService.getAccountFromUserId(requestAccount, null));
-    }
-
-    @Test
-    void 모임_통장_정보_읽기() {
-        // given
-        String reqAccount = "account123";
-        Account account = new Account();
-        List<GroupAccountMemberResponse> groupAccountMemberResponses = List.of(new GroupAccountMemberResponse(
-            tokenInfo.name(),
-            tokenInfo.img(),
-            tokenInfo.code(),
-            true
-        ));
-        when(accountDao.getAccount(reqAccount)).thenReturn(account);
-        when(groupAccountMemberService.getGroupAccountMember(account)).thenReturn(groupAccountMemberResponses);
-
-        // when
-        AccountDetailResponse result = accountService.getAccountInfo(tokenInfo, reqAccount);
-
-        // then
-        Assertions.assertNotNull(result);
-        verify(accountDao, times(1)).getAccount(reqAccount);
-        verify(groupAccountMemberService, times(1)).getGroupAccountMember(account);
     }
 
     @Test

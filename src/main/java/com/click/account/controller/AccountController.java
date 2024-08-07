@@ -14,6 +14,8 @@ import com.click.account.service.AccountService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,11 +40,12 @@ public class AccountController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public void saveAccount(
-        @RequestHeader("Authorization") String bearerToken,
+//        @RequestHeader("Authorization") String bearerToken,
+        @AuthenticationPrincipal TokenInfo tokenInfo,
         @RequestBody AccountRequest req
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+//        String token = bearerToken.substring(7);
+//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.saveAccount(tokenInfo, req);
     }
 
@@ -97,22 +100,18 @@ public class AccountController {
     }
   
     @GetMapping("user-account")
-    public List<UserAccountResponse> getAccountByUserId(@RequestHeader("Authorization") String bearerToken) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
+    public List<UserAccountResponse> getAccountByUserId(
+//        @RequestHeader("Authorization") String bearerToken
+        @AuthenticationPrincipal TokenInfo tokenInfo
+    ) {
+//        String token = bearerToken.substring(7);
+//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
     }
 
-
-
-    @GetMapping("/others")
-    public AccountUserInfo getAccountUserInfo(
-        @RequestHeader("Authorization") String bearerToken,
-        @RequestParam("account") String account
-    ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        return accountService.getAccountFromUserId(account, tokenInfo);
+    @GetMapping("/pay/check")
+    public Boolean checkAccountFromPayment(@RequestParam("account") String account) {
+        return accountService.checkAccount(account);
     }
 
     @GetMapping("/group")

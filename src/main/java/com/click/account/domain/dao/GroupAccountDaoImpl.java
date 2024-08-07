@@ -1,15 +1,14 @@
 package com.click.account.domain.dao;
 
-import com.click.account.config.utils.jwt.TokenInfo;
+import com.click.account.config.exception.GroupAccountMemeberException;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccountMember;
+import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.GroupAccountMemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
 
 @Slf4j
 @Repository
@@ -17,6 +16,7 @@ import java.util.UUID;
 public class GroupAccountDaoImpl implements GroupAccountDao{
     private final GroupAccountMemberRepository groupAccountMemberRepository;
     private final AccountDao accountDao;
+    private final UserDao userDao;
 
     @Override
     public void save(GroupAccountMember groupAccountMember) {
@@ -24,21 +24,17 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public void saveGroupToUser(TokenInfo tokenInfo, String reqAccount) {
-        Account account = accountDao.getAccount(reqAccount);
+    public void saveGroupToUser(User user, Account account) {
         boolean checkAdmin = !groupAccountMemberRepository.existsByAccountAndAdminIsTrue(account);
         log.info("{}", checkAdmin);
 
         groupAccountMemberRepository.save(
                 GroupAccountMember.builder()
                         .account(account)
-                        .userCode(tokenInfo.code())
-                        .userNickName(tokenInfo.name())
-                        .userPofileImg(tokenInfo.img())
                         .admin(checkAdmin)
                         .status(true)
                         .inviteCode(account.getGroupAccountCode())
-                        .userId(UUID.fromString(tokenInfo.id()))
+                        .user(user)
                         .build()
         );
     }
@@ -54,9 +50,9 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public List<GroupAccountMember> getGroupAccountMemberFromUserId(UUID userId) {
-        List<GroupAccountMember> groupAccountMembers = groupAccountMemberRepository.findByUserIdAndStatus(userId, false);
-        if (groupAccountMembers.isEmpty()) throw new IllegalArgumentException("요청을 진행할 친구가 없습니다.");
+    public List<GroupAccountMember> getGroupAccountMemberFromUser(User user) {
+        List<GroupAccountMember> groupAccountMembers = groupAccountMemberRepository.findByUserAndStatus(user, false);
+        if (groupAccountMembers.isEmpty()) throw new GroupAccountMemeberException();
         return groupAccountMembers;
     }
 
@@ -67,14 +63,8 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
     }
 
     @Override
-    public GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account) {
-        return groupAccountMemberRepository.findByUserCodeAndAccount(userCode, account)
-            .orElseThrow(IllegalArgumentException::new);
-    }
-
-    @Override
-    public GroupAccountMember getGroupAccountMemberStatusIsFalse(String userCode, Account account) {
-        return groupAccountMemberRepository.findByUserCodeAndAccount(userCode, account)
+    public GroupAccountMember getGroupAccountMemberStatusIsFalse(User user, Account account) {
+        return groupAccountMemberRepository.findByUserAndAccount(user, account)
             .orElseThrow(IllegalArgumentException::new);
     }
 
