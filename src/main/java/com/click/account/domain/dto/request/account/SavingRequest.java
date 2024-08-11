@@ -6,7 +6,8 @@ import java.time.LocalDate;
 public record SavingRequest(
     double interestRate,
     Integer term,
-    String product
+    String product,
+    String sendAccount
 ) {
     public SavingAccount toEntity(String account, LocalDate endAt) {
         return SavingAccount.builder()
@@ -14,7 +15,8 @@ public record SavingRequest(
             .interestRate(interestRate)
             .endAT(endAt)
             .product(product)
-            .account(account)
+            .myAccount(account)
+            .sendAccount(sendAccount)
             .build();
     }
 }

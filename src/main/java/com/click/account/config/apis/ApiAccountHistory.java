@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ApiAccountHistory {
-    private FeignAccountHistory feignAccountHistory;
+    private final FeignAccountHistory feignAccountHistory;
 
     @Async
     public void sendDepositInfo(DepositRequest req) {

@@ -13,6 +13,7 @@ import lombok.*;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ACCOUNT_ID")
     private Long id;
 
     @Column(name = "ACCOUNT")
@@ -47,9 +48,9 @@ public class Account {
     @Column(name = "ACCOUNT_TYPE")
     private Integer type;
 
-    @Column(name = "ACCOUNT_DISABLE")
+    @Column(name = "ACCOUNT_ABLE")
     @Setter
-    private Boolean accountDisable;
+    private Boolean accountAble;
 
     public void updateName(String accountName) {
         this.accountName = accountName;
@@ -66,19 +67,5 @@ public class Account {
     public void updateTransferLimit(Long accountDailyLimit, Long accountOneTimeLimit) {
         this.accountDailyLimit = accountDailyLimit;
         this.accountOneTimeLimit = accountOneTimeLimit;
-    }
-    public Account copyToFriend(User friend){
-        return Account.builder()
-            .account(account)
-            .user(friend)
-            .moneyAmount(moneyAmount)
-            .accountDailyLimit(accountDailyLimit)
-            .accountName(accountName)
-            .accountPassword(accountPassword)
-            .groupAccountCode(groupAccountCode)
-            .groupAccountMembers(groupAccountMembers)
-            .accountDisable(accountDisable)
-            .accountOneTimeLimit(accountOneTimeLimit)
-            .build();
     }
 }

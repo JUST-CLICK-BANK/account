@@ -19,4 +19,14 @@ public record FriendResponse(
             friend.getFriendRank()
         );
     }
+
+    public static Friend friend(FriendResponse friendResponse) {
+        return Friend.builder()
+            .friendId(friendResponse.id())
+            .friendCode(friendResponse.code())
+            .friendImg(friendResponse.img())
+            .friendName(friendResponse.name())
+            .friendRank(friendResponse.rank())
+            .build();
+    }
 }

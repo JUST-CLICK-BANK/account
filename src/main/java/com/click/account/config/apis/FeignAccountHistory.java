@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "account-history", url = "http://35.223.135.5:32041/api/v1/histories")
+@FeignClient(name = "account-history", url = "https://just-click.shop/api/v1/histories")
 public interface FeignAccountHistory {
 
     @PostMapping("/deposit")

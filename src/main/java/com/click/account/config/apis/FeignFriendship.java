@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "friendship", url = "34.135.133.145:30000/api/v1/friends")
+@FeignClient(name = "friendship", url = "https://just-click.shop/api/v1/friends")
 public interface FeignFriendship {
 
     @GetMapping("/invite/{code}")

@@ -32,9 +32,11 @@ public class Transfer {
     private Integer type;
 
     @Column(name = "TRANSFER_DATE")
-    private int transferDate;
+    private Integer transferDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @Column(name = "MY_ACCOUNT")
+    private String myAccount;
+
+    @Column(name = "ACCOUNT")
+    private String account;
 }
