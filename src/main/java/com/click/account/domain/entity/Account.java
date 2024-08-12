@@ -68,4 +68,18 @@ public class Account {
         this.accountDailyLimit = accountDailyLimit;
         this.accountOneTimeLimit = accountOneTimeLimit;
     }
+    public Account copyToFriend(User friend){
+        return Account.builder()
+            .account(account)
+            .user(friend)
+            .moneyAmount(moneyAmount)
+            .accountDailyLimit(accountDailyLimit)
+            .accountName(accountName)
+            .accountPassword(accountPassword)
+            .groupAccountCode(groupAccountCode)
+            .groupAccountMembers(groupAccountMembers)
+            .accountDisable(accountDisable)
+            .accountOneTimeLimit(accountOneTimeLimit)
+            .build();
+    }
 }

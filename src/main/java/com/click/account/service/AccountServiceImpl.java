@@ -17,7 +17,6 @@ import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
 import com.click.account.domain.dto.response.AccountResponse;
-import com.click.account.domain.dto.response.AutoTransferAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.domain.dto.response.UserResponse;
@@ -171,7 +170,6 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
         Account account = accountDao.getAccount(req.account());
-
         // 입금 받은 경우
         if (req.accountStatus().equals("deposit")) {
             Long money = account.getMoneyAmount() + req.moneyAmount();
@@ -182,6 +180,7 @@ public class AccountServiceImpl implements AccountService {
         // 출금한 경우
         if (req.accountStatus().equals("transfer")) {
             if (account.getMoneyAmount() <= 0) throw new InsufficientAmountException(req.moneyAmount());
+          
             // 일회 한도를 넘었을 경우 에러
             if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new LimitTransferException(
                 account.getAccountOneTimeLimit());
