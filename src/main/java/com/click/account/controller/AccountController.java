@@ -7,7 +7,9 @@ import com.click.account.domain.dto.request.account.AccountNameRequest;
 import com.click.account.domain.dto.request.account.AccountPasswordRequest;
 import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
+import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
+import com.click.account.domain.dto.response.AutoTransferAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.service.AccountService;
@@ -24,14 +26,6 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/accounts")
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*",
-    methods = {
-        RequestMethod.GET,
-        RequestMethod.POST,
-        RequestMethod.PUT,
-        RequestMethod.DELETE,
-        RequestMethod.OPTIONS
-})
 public class AccountController {
 
     private final AccountService accountService;
@@ -43,6 +37,44 @@ public class AccountController {
         @RequestBody AccountRequest req
     ) {
         accountService.saveAccount(tokenInfo, req);
+    }
+
+    @GetMapping("user-account")
+    public List<UserAccountResponse> getAccountByUserId(
+        TokenInfo tokenInfo
+    ) {
+        return accountService.findUserAccountByUserIdAndAccount(tokenInfo);
+    }
+
+    // 상대 계좌 정보 가져오기
+    @GetMapping("/others")
+    public AccountUserInfo getAccountUserInfo(
+        TokenInfo tokenInfo,
+        @RequestParam("account") String account
+    ) {
+        return accountService.getAccountFromUserId(account, tokenInfo);
+    }
+
+    // pay에 보낼 계좌에 대한 잔액 확인 로직
+    @GetMapping("/pay")
+    public AccountAmountResponse getAccountAmount(@RequestParam("account") String account) {
+        return accountService.getAccountMount(account);
+    }
+
+    // 모임 통장 멤버 목록
+    @GetMapping("/group")
+    public AccountDetailResponse getAccount(
+        TokenInfo tokenInfo,
+        @RequestParam("account") String account
+    ) {
+        return accountService.getAccountInfo(tokenInfo, account);
+    }
+
+    @GetMapping("/saving")
+    public List<AutoTransferAccountResponse> getAccounts(
+        TokenInfo tokenInfo
+    ) {
+        return accountService.getAccounts(tokenInfo);
     }
 
     @PutMapping("/name")
@@ -83,26 +115,6 @@ public class AccountController {
         @RequestParam("account") String account
     ) {
         accountService.deleteAccount(UUID.fromString(tokenInfo.id()), account);
-    }
-  
-    @GetMapping("user-account")
-    public List<UserAccountResponse> getAccountByUserId(
-        TokenInfo tokenInfo
-    ) {
-        return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
-    }
-
-    @GetMapping("/pay/check")
-    public Boolean checkAccountFromPayment(@RequestParam("account") String account) {
-        return accountService.checkAccount(account);
-    }
-
-    @GetMapping("/group")
-    public AccountDetailResponse getAccount(
-        TokenInfo tokenInfo,
-        @RequestParam("account") String account
-    ) {
-        return accountService.getAccountInfo(tokenInfo, account);
     }
 
 }

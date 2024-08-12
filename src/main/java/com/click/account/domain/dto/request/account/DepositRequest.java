@@ -4,7 +4,6 @@ public record DepositRequest(
     String bhName,
     Long bhAmount,
     String myAccount,
-    String yourAccount,
     String bhStatus,
     Long bhBalance,
     Long categoryId
@@ -14,7 +13,6 @@ public record DepositRequest(
             bhName,
             req.moneyAmount(),
             req.account(),
-            req.transferAccount(),
             "입금",
             bhBalance,
             req.category()

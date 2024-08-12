@@ -7,8 +7,10 @@ import com.click.account.domain.repository.FriendRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FriendServiceImpl implements FriendService {
@@ -17,17 +19,10 @@ public class FriendServiceImpl implements FriendService {
 
     @Override
     public List<FriendResponse> getFriends(TokenInfo tokenInfo, String account) {
-        if(tokenInfo == null) throw new IllegalArgumentException("Not Found User");
-
-        List<Friend> friends = friendRepository.findByAccount(account);
-
-        return friends.stream().map(FriendResponse::from).collect(Collectors.toList());
-    }
-
-    @Override
-    public void save(String code, String account) {
-        List<Friend> friends = apiService.getFriendsInfo(code, account);
+        List<Friend> friends = apiService.getFriendsInfo(tokenInfo.code(), account);
         if (friends.isEmpty()) throw new IllegalArgumentException();
-       friendRepository.saveAll(friends);
+        friendRepository.saveAll(friends);
+
+        return friends.stream().map(FriendResponse::from).toList();
     }
 }

@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupAccountMemberController {
     private final GroupAccountMemberService groupAccountMemberService;
 
+    // 요청 승인시 true 값으로 저장
+    // 거절시 삭제
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void saveGroup(
@@ -34,6 +36,7 @@ public class GroupAccountMemberController {
         groupAccountMemberService.save(tokenInfo, req.status());
     }
 
+    // 모임 통장 요청 로직
     @PostMapping("wait")
     public void waitMember(
         TokenInfo tokenInfo,
@@ -43,6 +46,7 @@ public class GroupAccountMemberController {
         groupAccountMemberService.saveWaitingMember(tokenInfo, account, requests);
     }
 
+    // 모임 초대 수락 및 거절할 목록
     @GetMapping("/accept")
     public List<GroupAccountMemberResponse> acceptMember(
         TokenInfo tokenInfo

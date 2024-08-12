@@ -30,11 +30,14 @@ public class SavingAccount {
     private LocalDate endAT;
 
     @Column(name = "INTEREST_RATE")
-    private double interestRate;
+    private Double interestRate;
 
     @Column(name = "PRODUCT_NAME")
     private String product;
 
-    @Column(name = "ACCOUNT")
-    private String account;
+    @Column(name = "MY_ACCOUNT")
+    private String myAccount;
+
+    @Column(name = "SEND_ACCOUNT")
+    private String sendAccount;
 }
