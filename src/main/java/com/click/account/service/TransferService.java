@@ -1,9 +1,8 @@
 package com.click.account.service;
 
-import com.click.account.domain.dto.request.account.SavingAccountReqeust;
+import com.click.account.domain.dto.request.account.TransferRequest;
 import com.click.account.domain.entity.Account;
 
 public interface TransferService {
-    void save(Account account, SavingAccountReqeust req);
-
+    void save(TransferRequest req, String myAccount);
 }

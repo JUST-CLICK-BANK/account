@@ -2,41 +2,42 @@ package com.click.account.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Builder
-@Table(name = "TRANSFERS")
-public class Transfer {
+@Table(name = "SAVING_ACCOUNTS")
+public class SavingAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "AUTO_TRANSFER_AMOUNT")
-    private Long amount;
+    @Column(name = "CREATE_AT")
+    private LocalDate createAt;
 
-    @Column(name = "TYPE")
-    private Integer type;
+    @Column(name = "END_AT")
+    private LocalDate endAT;
 
-    @Column(name = "TRANSFER_DATE")
-    private Integer transferDate;
+    @Column(name = "INTEREST_RATE")
+    private Double interestRate;
+
+    @Column(name = "PRODUCT_NAME")
+    private String product;
 
     @Column(name = "MY_ACCOUNT")
     private String myAccount;
 
-    @Column(name = "ACCOUNT")
-    private String account;
+    @Column(name = "SEND_ACCOUNT")
+    private String sendAccount;
 }

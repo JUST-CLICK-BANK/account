@@ -14,6 +14,7 @@ import com.click.account.domain.dto.request.account.AccountNameRequest;
 import com.click.account.domain.dto.request.account.AccountPasswordRequest;
 import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
+import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
@@ -24,13 +25,14 @@ import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
@@ -39,8 +41,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final ApiService apiService;
     private final UserService userService;
-    private final FriendService friendService;
     private final TransferService transferService;
+    private final SavingAccountService savingAccountService;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
@@ -63,7 +65,6 @@ public class AccountServiceImpl implements AccountService {
         }
         // 모임 통장 계좌 생성
         else if (type == 2) {
-            friendService.save(user.getUserCode(), makeAccount);
             Account account = req.toGroupEntity(
                 makeAccount,
                 user.getUserNickName()+"의 모임 통장",
@@ -84,7 +85,8 @@ public class AccountServiceImpl implements AccountService {
                 true,
                 type
             );
-            transferService.save(account, req.savingAccountReqeust());
+            savingAccountService.save(req.savingRequest(), makeAccount);
+            transferService.save(req.transferRequest(), makeAccount);
             accountDao.saveAccount(account);
         }
     }
@@ -98,21 +100,22 @@ public class AccountServiceImpl implements AccountService {
     }
 
     // 계좌 유효성 검증
-    public Boolean checkAccount(String reqAccount) {
+    @Override
+    public AccountAmountResponse getAccountMount(String reqAccount) {
         Account account = accountDao.getAccount(reqAccount);
-        if (account == null) return false;
-        return true;
+        if (account == null) throw new IllegalArgumentException();
+        return AccountAmountResponse.from(account);
     }
 
     @Override
-    public List<UserAccountResponse> findUserAccountByUserIdAndAccount(UUID userId, TokenInfo tokenInfo) {
-        List<Account> disabledAccount = accountRepository.findAccounts(userId,true);
-        if (disabledAccount.isEmpty()) {
+    public List<UserAccountResponse> findUserAccountByUserIdAndAccount(TokenInfo tokenInfo) {
+        List<Account> abledAccount = accountRepository.findAccounts(UUID.fromString(tokenInfo.id()),true);
+        if (abledAccount.isEmpty()) {
             return List.of();
         }
-        List<AccountResponse> accountResponses = disabledAccount.stream()
+        List<AccountResponse> accountResponses = abledAccount.stream()
             .map(AccountResponse::from)
-            .collect(Collectors.toList());
+            .toList();
 
         return List.of(UserAccountResponse.from(accountResponses, tokenInfo));
     }
@@ -120,6 +123,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountUserInfo getAccountFromUserId(String requestAccount, TokenInfo tokenInfo) {
         Account account = accountDao.getAccount(requestAccount);
+        log.info(account.getAccount());
         return AccountUserInfo.from(account, account.getUser().getUserId().toString());
     }
 
@@ -137,8 +141,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public List<AutoTransferAccountResponse> getAccounts(TokenInfo tokenInfo) {
+        List<Account> accounts = accountDao.getAccountFromType(UUID.fromString(tokenInfo.id()), 1);
+        return accounts.stream()
+            .map(
+                account ->
+                    AutoTransferAccountResponse.from(account.getAccount())
+            )
+            .toList();
+    }
+
+    @Override
     @Transactional
     public void updateName(UUID userId, AccountNameRequest req) {
+        log.info(req.account());
         Account account = accountDao.getAccount(req.account());
         account.updateName(req.accountName());
     }
@@ -154,10 +170,6 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
         Account account = accountDao.getAccount(req.account());
-
-        if (account.getAccountOneTimeLimit() <= req.moneyAmount()) throw new LimitTransferException(
-            account.getAccountOneTimeLimit());
-
         // 입금 받은 경우
         if (req.accountStatus().equals("deposit")) {
             Long money = account.getMoneyAmount() + req.moneyAmount();
@@ -168,7 +180,8 @@ public class AccountServiceImpl implements AccountService {
         // 출금한 경우
         if (req.accountStatus().equals("transfer")) {
             if (account.getMoneyAmount() <= 0) throw new InsufficientAmountException(req.moneyAmount());
-            // 일화 한도를 넘었을 경우 에러
+          
+            // 일회 한도를 넘었을 경우 에러
             if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new LimitTransferException(
                 account.getAccountOneTimeLimit());
             long money = account.getMoneyAmount()  - req.moneyAmount();
@@ -185,10 +198,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
     public void deleteAccount(UUID userId, String reqAccount) {
+        log.info(String.valueOf(userId));
+        log.info(reqAccount);
         Account account = accountRepository.findUserIdAndAccount(userId, reqAccount)
             .orElseThrow(NotExistAccountException::new);
-        account.setAccountDisable(false);
+        if (account.getType() == 3) {
+            savingAccountService.delete(account);
+        }
+        account.setAccountAble(false);
         accountRepository.save(account);
     }
 }

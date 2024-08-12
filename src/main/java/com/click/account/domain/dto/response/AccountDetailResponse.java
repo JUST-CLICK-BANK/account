@@ -7,6 +7,7 @@ public record AccountDetailResponse(
     String account,
     String accountName,
     String groupAccountCode,
+    Integer type,
     List<UserResponse> userResponses
 ) {
     public static AccountDetailResponse from(Account account, List<UserResponse> userResponses) {
@@ -14,6 +15,7 @@ public record AccountDetailResponse(
             account.getAccount(),
             account.getAccountName(),
             account.getGroupAccountCode(),
+            account.getType(),
             userResponses
         );
     }

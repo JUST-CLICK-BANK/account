@@ -7,7 +7,9 @@ import com.click.account.domain.dto.request.account.AccountNameRequest;
 import com.click.account.domain.dto.request.account.AccountPasswordRequest;
 import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
+import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
+import com.click.account.domain.dto.response.AutoTransferAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
 import com.click.account.service.AccountService;
@@ -24,104 +26,95 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/accounts")
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*",
-    methods = {
-        RequestMethod.GET,
-        RequestMethod.POST,
-        RequestMethod.PUT,
-        RequestMethod.DELETE,
-        RequestMethod.OPTIONS
-})
 public class AccountController {
 
     private final AccountService accountService;
-    private final JwtUtils jwtUtils;
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public void saveAccount(
-//        @RequestHeader("Authorization") String bearerToken,
-        @AuthenticationPrincipal TokenInfo tokenInfo,
+        TokenInfo tokenInfo,
         @RequestBody AccountRequest req
     ) {
-//        String token = bearerToken.substring(7);
-//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.saveAccount(tokenInfo, req);
+    }
+
+    @GetMapping("user-account")
+    public List<UserAccountResponse> getAccountByUserId(
+        TokenInfo tokenInfo
+    ) {
+        return accountService.findUserAccountByUserIdAndAccount(tokenInfo);
+    }
+
+    // 상대 계좌 정보 가져오기
+    @GetMapping("/others")
+    public AccountUserInfo getAccountUserInfo(
+        TokenInfo tokenInfo,
+        @RequestParam("account") String account
+    ) {
+        return accountService.getAccountFromUserId(account, tokenInfo);
+    }
+
+    // pay에 보낼 계좌에 대한 잔액 확인 로직
+    @GetMapping("/pay")
+    public AccountAmountResponse getAccountAmount(@RequestParam("account") String account) {
+        return accountService.getAccountMount(account);
+    }
+
+    // 모임 통장 멤버 목록
+    @GetMapping("/group")
+    public AccountDetailResponse getAccount(
+        TokenInfo tokenInfo,
+        @RequestParam("account") String account
+    ) {
+        return accountService.getAccountInfo(tokenInfo, account);
+    }
+
+    @GetMapping("/saving")
+    public List<AutoTransferAccountResponse> getAccounts(
+        TokenInfo tokenInfo
+    ) {
+        return accountService.getAccounts(tokenInfo);
     }
 
     @PutMapping("/name")
     public void updateName(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestBody AccountNameRequest req
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updateName(UUID.fromString(tokenInfo.id()), req);
     }
 
     @PutMapping("/password")
     public void updatePassword(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestBody AccountPasswordRequest req
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updatePassword(UUID.fromString(tokenInfo.id()), req);
     }
 
     @PutMapping("/amount")
     public void updateMoney(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestBody AccountMoneyRequest req
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updateMoney(UUID.fromString(tokenInfo.id()), req);
     }
 
     @PutMapping("/limit")
     public void updateAccountLimit(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestBody AccountTransferLimitRequest req
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.updateAccountLimit(UUID.fromString(tokenInfo.id()), req);
     }
 
     @DeleteMapping()
     public void deleteAccount(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestParam("account") String account
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         accountService.deleteAccount(UUID.fromString(tokenInfo.id()), account);
-    }
-  
-    @GetMapping("user-account")
-    public List<UserAccountResponse> getAccountByUserId(
-//        @RequestHeader("Authorization") String bearerToken
-        @AuthenticationPrincipal TokenInfo tokenInfo
-    ) {
-//        String token = bearerToken.substring(7);
-//        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        return accountService.findUserAccountByUserIdAndAccount(UUID.fromString(tokenInfo.id()),tokenInfo);
-    }
-
-    @GetMapping("/pay/check")
-    public Boolean checkAccountFromPayment(@RequestParam("account") String account) {
-        return accountService.checkAccount(account);
-    }
-
-    @GetMapping("/group")
-    public AccountDetailResponse getAccount(
-        @RequestHeader("Authorization") String bearerToken,
-        @RequestParam("account") String account
-    ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
-        return accountService.getAccountInfo(tokenInfo, account);
     }
 
 }

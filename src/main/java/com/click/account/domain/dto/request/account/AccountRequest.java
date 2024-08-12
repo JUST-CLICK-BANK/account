@@ -7,13 +7,14 @@ import com.click.account.domain.entity.User;
 public record AccountRequest(
         String accountStatus,
         String accountPassword,
-        SavingAccountReqeust savingAccountReqeust
+        TransferRequest transferRequest,
+        SavingRequest savingRequest
 ) {
     public Account toEntity(
             String account,
             String accountName,
             User user,
-            boolean accountDisable,
+            Boolean accountAble,
             Integer type
     ) {
         return Account.builder()
@@ -24,7 +25,7 @@ public record AccountRequest(
                 .moneyAmount(10000000L)
                 .accountDailyLimit(1000000L)
                 .accountOneTimeLimit(1000000L)
-                .accountDisable(accountDisable)
+                .accountAble(accountAble)
                 .type(type)
                 .build();
     }
@@ -34,7 +35,7 @@ public record AccountRequest(
             String accountName,
             User user,
             String groupAccountCode,
-            boolean accountDisable,
+            Boolean accountAble,
             Integer type
     ) {
         return Account.builder()
@@ -44,7 +45,7 @@ public record AccountRequest(
                 .accountName(accountName)
                 .accountDailyLimit(1000000L)
                 .accountOneTimeLimit(1000000L)
-                .accountDisable(accountDisable)
+                .accountAble(accountAble)
                 .groupAccountCode(groupAccountCode)
                 .type(type)
                 .build();
@@ -54,7 +55,7 @@ public record AccountRequest(
         String account,
         String accountName,
         User user,
-        boolean accountDisable,
+        Boolean accountAble,
         Integer type
     ) {
         return Account.builder()
@@ -62,7 +63,7 @@ public record AccountRequest(
             .accountName(accountName)
             .user(user)
             .accountPassword(accountPassword)
-            .accountDisable(accountDisable)
+            .accountAble(accountAble)
             .type(type)
             .build();
     }

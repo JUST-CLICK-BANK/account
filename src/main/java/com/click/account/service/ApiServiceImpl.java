@@ -37,18 +37,8 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public List<Friend> getFriendsInfo(String userCode, String account) {
-        log.info(userCode);
-
         List<FriendResponse> friendResponses = apiFriendship.inviteFriend(userCode);
 
-        return friendResponses.stream().map(friendResponse ->
-             Friend.builder()
-                 .friendId(friendResponse.id())
-                .friendImg(friendResponse.img())
-                .friendName(friendResponse.name())
-                .friendCode(friendResponse.code())
-                .account(account)
-                .build())
-            .toList();
+        return friendResponses.stream().map(FriendResponse::friend).toList();
     }
 }

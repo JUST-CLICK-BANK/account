@@ -11,7 +11,7 @@ public record GroupAccountResponse(
     Long moneyAmount,
     String userProfileImg,
     String userNickname,
-    Boolean accountDisable
+    Boolean accountAble
 
 ) {
     public static GroupAccountResponse from(Account account, GroupAccountMember groupAccount) {
@@ -19,7 +19,7 @@ public record GroupAccountResponse(
                 .account(account.getAccount())
                 .accountName(account.getAccountName())
                 .moneyAmount(account.getMoneyAmount())
-                .accountDisable(account.getAccountDisable())
+                .accountAble(account.getAccountAble())
                 .build();
 
     }

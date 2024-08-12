@@ -17,15 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/accounts/friends")
 public class FriendController {
     private final FriendService friendService;
-    private final JwtUtils jwtUtils;
 
     @GetMapping()
     public List<FriendResponse> getFriends(
-        @RequestHeader("Authorization") String bearerToken,
+        TokenInfo tokenInfo,
         @RequestParam("account") String account
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return friendService.getFriends(tokenInfo, account);
     }
 }

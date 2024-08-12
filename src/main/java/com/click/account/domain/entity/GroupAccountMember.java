@@ -32,11 +32,11 @@ public class GroupAccountMember {
     private String inviteCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_CODE")
+    @JoinColumn(name = "USER_ID")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "ACCOUNT_ID")
     private Account account;
 
     public void setStatus(Boolean status) {

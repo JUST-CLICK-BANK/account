@@ -15,25 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/accounts/users")
-@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*",
-    methods = {
-        RequestMethod.GET,
-        RequestMethod.POST,
-        RequestMethod.PUT,
-        RequestMethod.DELETE,
-        RequestMethod.OPTIONS
-    })
 public class UserController {
 
     private final UserService userService;
-    private final JwtUtils jwtUtils;
 
     @GetMapping()
     public UserResponse getUser(
-        @RequestHeader("Authorization") String bearerToken
+        TokenInfo tokenInfo
     ) {
-        String token = bearerToken.substring(7);
-        TokenInfo tokenInfo = jwtUtils.parseUserToken(token);
         return userService.getUserInfo(tokenInfo);
     }
 }
