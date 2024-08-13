@@ -8,7 +8,7 @@ public record WithdrawRequest(
     Long bhBalance,
     Integer bhOutType,
     Long cardId,
-    Long categoryId
+    Integer categoryId
 ) {
     public static WithdrawRequest toTransfer(AccountMoneyRequest req, String bhName, Long bhBalance) {
         return new WithdrawRequest(

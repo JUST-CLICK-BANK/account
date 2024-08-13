@@ -9,6 +9,7 @@ import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
+import com.click.account.domain.dto.response.AccountInfoResponse;
 import com.click.account.domain.dto.response.AutoTransferAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
@@ -61,6 +62,11 @@ public class AccountController {
         return accountService.getAccountMount(account);
     }
 
+    @GetMapping("/card")
+    public AccountInfoResponse getAccountInfo(@RequestParam("account") String account) {
+        return accountService.getAccountInfoToCard(account);
+    }
+
     // 모임 통장 멤버 목록
     @GetMapping("/group")
     public AccountDetailResponse getAccount(
@@ -98,6 +104,7 @@ public class AccountController {
         TokenInfo tokenInfo,
         @RequestBody AccountMoneyRequest req
     ) {
+        System.out.println(req.toString());
         accountService.updateMoney(UUID.fromString(tokenInfo.id()), req);
     }
 
@@ -114,7 +121,7 @@ public class AccountController {
         TokenInfo tokenInfo,
         @RequestParam("account") String account
     ) {
-        accountService.deleteAccount(UUID.fromString(tokenInfo.id()), account);
+        accountService.deleteAccount(tokenInfo, account);
     }
 
 }

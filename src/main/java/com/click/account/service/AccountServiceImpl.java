@@ -6,6 +6,7 @@ import com.click.account.config.exception.LimitTransferException;
 import com.click.account.config.exception.NotExistAccountException;
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.account.GroupCode;
+import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
@@ -16,6 +17,7 @@ import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
+import com.click.account.domain.dto.response.AccountInfoResponse;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.AutoTransferAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
@@ -44,6 +46,7 @@ public class AccountServiceImpl implements AccountService {
     private final UserService userService;
     private final TransferService transferService;
     private final SavingAccountService savingAccountService;
+    private final JwtUtils jwtUtils;
 
     @Override
     public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
@@ -109,6 +112,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountInfoResponse getAccountInfoToCard(String reqAccount) {
+        Account account = accountDao.getAccount(reqAccount);
+        return AccountInfoResponse.from(account);
+    }
+
+    @Override
     public List<UserAccountResponse> findUserAccountByUserIdAndAccount(TokenInfo tokenInfo) {
         List<Account> abledAccount = accountRepository.findAccounts(UUID.fromString(tokenInfo.id()),true);
         if (abledAccount.isEmpty()) {
@@ -168,6 +177,29 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public void payMoney(AccountMoneyRequest req) {
+        Account account = accountDao.getAccount(req.account());
+
+        // 입금 받은 경우
+        if (req.accountStatus().equals("deposit")) {
+            Long money = account.getMoneyAmount() + req.moneyAmount();
+            account.updateMoney(money);
+            apiService.sendDeposit(req, account);
+        }
+
+        // 출금한 경우
+        if (req.accountStatus().equals("transfer")) {
+            if (account.getMoneyAmount() <= 0) throw new InsufficientAmountException(req.moneyAmount());
+            // 일회 한도를 넘었을 경우 에러
+            if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new LimitTransferException(
+                account.getAccountOneTimeLimit());
+            long money = account.getMoneyAmount()  - req.moneyAmount();
+            account.updateMoney(money);
+            apiService.sendWithdraw(req, account);
+        }
+    }
+
+    @Override
     @Transactional
     public void updateMoney(UUID userId, AccountMoneyRequest req) {
         Account account = accountDao.getAccount(req.account());
@@ -200,16 +232,20 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void deleteAccount(UUID userId, String reqAccount) {
-        log.info(String.valueOf(userId));
+    public void deleteAccount(TokenInfo tokenInfo, String reqAccount) {
+        log.info(String.valueOf(tokenInfo.id()));
         log.info(reqAccount);
-        Account account = accountRepository.findUserIdAndAccount(userId, reqAccount)
+        String token = "Bearer " + jwtUtils.createToken(tokenInfo);
+        Account account = accountRepository.findUserIdAndAccount(
+            UUID.fromString(tokenInfo.id()),
+                reqAccount)
             .orElseThrow(NotExistAccountException::new);
         if (account.getType() == 3) {
             savingAccountService.delete(account);
         }
         account.setAccountAble(false);
         accountRepository.save(account);
+        apiService.sendAccount(token, account);
     }
 }
 

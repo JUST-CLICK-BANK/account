@@ -1,6 +1,7 @@
 package com.click.account.service;
 
 import com.click.account.config.apis.ApiAccountHistory;
+import com.click.account.config.apis.ApiCard;
 import com.click.account.config.apis.ApiFriendship;
 import com.click.account.domain.dto.request.account.AccountMoneyRequest;
 import com.click.account.domain.dto.request.account.DepositRequest;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class ApiServiceImpl implements ApiService {
     private final ApiAccountHistory apiAccountHistory;
     private final ApiFriendship apiFriendship;
+    private final ApiCard apiCard;
 
     @Override
     public void sendDeposit(AccountMoneyRequest req, Account account) {
@@ -40,5 +42,10 @@ public class ApiServiceImpl implements ApiService {
         List<FriendResponse> friendResponses = apiFriendship.inviteFriend(userCode);
 
         return friendResponses.stream().map(FriendResponse::friend).toList();
+    }
+
+    @Override
+    public void sendAccount(String token, Account account) {
+        apiCard.deleteCard(token, account.getAccount());
     }
 }

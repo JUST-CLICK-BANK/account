@@ -9,4 +9,5 @@ public interface ApiService {
     void sendDeposit(AccountMoneyRequest req, Account account);
     void sendWithdraw(AccountMoneyRequest req, Account account);
     List<Friend> getFriendsInfo(String userCode, String account);
+    void sendAccount(String token, Account account);
 }
