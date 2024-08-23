@@ -20,7 +20,11 @@ public class CustomSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.userDetailsService(authService);
         http.authorizeHttpRequests(request ->
-            request.requestMatchers("/api/v1/accounts", "/actuator/health")
+            request.requestMatchers(
+                "/api/v1/accounts/pay",
+                    "/actuator/health",
+                    "/api/v1/accounts/card"
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()

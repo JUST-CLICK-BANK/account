@@ -9,6 +9,7 @@ import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
+import com.click.account.domain.dto.response.AccountInfoResponse;
 import com.click.account.domain.dto.response.AutoTransferAccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
@@ -32,11 +33,11 @@ public class AccountController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveAccount(
+    public String saveAccount(
         TokenInfo tokenInfo,
         @RequestBody AccountRequest req
     ) {
-        accountService.saveAccount(tokenInfo, req);
+        return accountService.saveAccount(tokenInfo, req);
     }
 
     @GetMapping("user-account")
@@ -47,7 +48,7 @@ public class AccountController {
     }
 
     // 상대 계좌 정보 가져오기
-    @GetMapping("/others")
+    @GetMapping("/info")
     public AccountUserInfo getAccountUserInfo(
         TokenInfo tokenInfo,
         @RequestParam("account") String account
@@ -59,6 +60,11 @@ public class AccountController {
     @GetMapping("/pay")
     public AccountAmountResponse getAccountAmount(@RequestParam("account") String account) {
         return accountService.getAccountMount(account);
+    }
+
+    @GetMapping("/card")
+    public AccountInfoResponse getAccountInfo(@RequestParam("account") String account) {
+        return accountService.getAccountInfoToCard(account);
     }
 
     // 모임 통장 멤버 목록
@@ -98,7 +104,7 @@ public class AccountController {
         TokenInfo tokenInfo,
         @RequestBody AccountMoneyRequest req
     ) {
-        accountService.updateMoney(UUID.fromString(tokenInfo.id()), req);
+        accountService.updateMoney(tokenInfo, req);
     }
 
     @PutMapping("/limit")
@@ -114,7 +120,7 @@ public class AccountController {
         TokenInfo tokenInfo,
         @RequestParam("account") String account
     ) {
-        accountService.deleteAccount(UUID.fromString(tokenInfo.id()), account);
+        accountService.deleteAccount(tokenInfo, account);
     }
 
 }

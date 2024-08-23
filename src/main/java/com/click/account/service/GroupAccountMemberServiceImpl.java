@@ -11,11 +11,13 @@ import com.click.account.domain.entity.Friend;
 import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.FriendRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +50,6 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
     @Override
     public void saveWaitingMember(TokenInfo tokenInfo, String reqAccount, List<GroupAccountMemberRequest> requests) {
         Account account = accountDao.getAccount(reqAccount);
-
         List<User> users = requests.stream().map(request -> User
             .builder()
             .userId(UUID.fromString(request.id()))
@@ -78,19 +79,19 @@ public class GroupAccountMemberServiceImpl implements GroupAccountMemberService 
         List<GroupAccountMember> groupAccountMembers = groupAccountDao.getGroupAccountMemberFromUser(user);
 
         return groupAccountMembers.stream()
-            .map(groupAccountMember -> userDao.getUserFromUserCode(groupAccountMember.getUser().getUserCode()))
+            .map(groupAccountMember -> accountDao.getAccount(groupAccountMember.getAccount().getAccount()))
             .filter(Objects::nonNull)
-            .map(GroupAccountMemberResponse::from)
+            .map(account -> GroupAccountMemberResponse.from(account.getAccountName()))
             .toList();
     }
 
     @Override
     public void delete(TokenInfo tokenInfo, String reqAccount) {
-        if (tokenInfo.id() == null || reqAccount == null || reqAccount.isEmpty()) throw new IllegalArgumentException();
+        if (reqAccount == null || reqAccount.isEmpty()) throw new IllegalArgumentException();
         User user = userService.getUser(tokenInfo);
         Account account = accountDao.getAccount(reqAccount);
 
-        GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberStatusIsFalse(user, account);
+        GroupAccountMember groupAccountMember = groupAccountDao.getGroupAccountMemberInfo(user, account);
       
         if (groupAccountDao.getGroupAccountStatusIsTrue(account) <= 1) accountDao.deleteAccount(account);
         groupAccountDao.deleteGroupMember(groupAccountMember);

@@ -6,7 +6,7 @@ public record DepositRequest(
     String myAccount,
     String bhStatus,
     Long bhBalance,
-    Long categoryId
+    Integer categoryId
 ) {
     public static DepositRequest toTranfer(AccountMoneyRequest req, String bhName, Long bhBalance) {
         return new DepositRequest(

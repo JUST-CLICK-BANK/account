@@ -3,8 +3,9 @@ package com.click.account.domain.dto.request.account;
 public record AccountMoneyRequest(
         String accountStatus,
         String account,
-        String transferAccount,
+        String nickname,
         Long moneyAmount,
-        Long category
+        Integer category,
+        Long cardId
 ) {
 }

@@ -22,7 +22,7 @@ public record AccountRequest(
                 .accountName(accountName)
                 .user(user)
                 .accountPassword(accountPassword)
-                .moneyAmount(10000000L)
+                .moneyAmount(0L)
                 .accountDailyLimit(1000000L)
                 .accountOneTimeLimit(1000000L)
                 .accountAble(accountAble)

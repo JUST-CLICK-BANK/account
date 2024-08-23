@@ -2,16 +2,14 @@ package com.click.account.domain.dto.response;
 
 import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.entity.User;
+import java.util.List;
 
 public record GroupAccountMemberResponse(
-    User user
+    String accountName
 ) {
-    public static GroupAccountMemberResponse from(User user) {
+    public static GroupAccountMemberResponse from(String accountName) {
         return new GroupAccountMemberResponse(
-            User.builder()
-                .userCode(user.getUserCode())
-                .userPorfileImg(user.getUserPorfileImg())
-                .userNickName(user.getUserNickName())
-                .build());
+            accountName
+        );
     }
 }
