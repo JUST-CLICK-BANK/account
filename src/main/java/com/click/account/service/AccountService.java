@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AccountService {
-    void saveAccount(TokenInfo tokenInfo, AccountRequest req);
+    String saveAccount(TokenInfo tokenInfo, AccountRequest req);
     AccountAmountResponse getAccountMount(String reqAccount);
     AccountInfoResponse getAccountInfoToCard(String reqAccount);
     List<UserAccountResponse> findUserAccountByUserIdAndAccount(TokenInfo tokenInfo);
@@ -26,8 +26,7 @@ public interface AccountService {
     List<AutoTransferAccountResponse> getAccounts(TokenInfo tokenInfo);
     void updateName(UUID userId, AccountNameRequest req);
     void updatePassword(UUID userId, AccountPasswordRequest req);
-    void payMoney(AccountMoneyRequest req);
-    void updateMoney(UUID userId, AccountMoneyRequest req);
+    void updateMoney(TokenInfo tokenInfo, AccountMoneyRequest req);
     void updateAccountLimit(UUID userId, AccountTransferLimitRequest req);
     void deleteAccount(TokenInfo tokenInfo,String account);
 }

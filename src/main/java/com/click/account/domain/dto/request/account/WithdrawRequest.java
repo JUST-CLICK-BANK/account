@@ -18,7 +18,7 @@ public record WithdrawRequest(
             "출금",
             bhBalance,
             1,
-            null,
+            req.cardId(),
             req.category()
         );
     }

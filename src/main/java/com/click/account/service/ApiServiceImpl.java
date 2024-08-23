@@ -24,16 +24,16 @@ public class ApiServiceImpl implements ApiService {
     private final ApiCard apiCard;
 
     @Override
-    public void sendDeposit(AccountMoneyRequest req, Account account) {
+    public void sendDeposit(AccountMoneyRequest req, Account account, String nickname) {
         log.info(req.moneyAmount().toString());
-        DepositRequest depositRequest = DepositRequest.toTranfer(req, account.getAccountName(), account.getMoneyAmount());
+        DepositRequest depositRequest = DepositRequest.toTranfer(req, nickname, account.getMoneyAmount());
         apiAccountHistory.sendDepositInfo(depositRequest);
     }
 
     @Override
-    public void sendWithdraw(AccountMoneyRequest req, Account account) {
+    public void sendWithdraw(AccountMoneyRequest req, Account account, String nickname) {
         log.info(req.moneyAmount().toString());
-        WithdrawRequest withdrawRequest = WithdrawRequest.toTransfer(req, account.getAccountName(), account.getMoneyAmount());
+        WithdrawRequest withdrawRequest = WithdrawRequest.toTransfer(req, nickname, account.getMoneyAmount());
         apiAccountHistory.sendWithdrawInfo(withdrawRequest);
     }
 
@@ -41,7 +41,9 @@ public class ApiServiceImpl implements ApiService {
     public List<Friend> getFriendsInfo(String userCode, String account) {
         List<FriendResponse> friendResponses = apiFriendship.inviteFriend(userCode);
 
-        return friendResponses.stream().map(FriendResponse::friend).toList();
+        return friendResponses.stream()
+            .map(friendResponse -> FriendResponse.friend(friendResponse, account))
+            .toList();
     }
 
     @Override

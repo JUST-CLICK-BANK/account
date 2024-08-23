@@ -38,11 +38,11 @@ public class JwtUtils {
 
     public String createToken(TokenInfo tokenInfo) {
         return Jwts.builder()
-            .claim("id", String.class)
-            .claim("code", String.class)
-            .claim("img", String.class)
-            .claim("name", String.class)
-            .claim("rank", Integer.class)
+            .claim("id", tokenInfo.id())
+            .claim("code", tokenInfo.code())
+            .claim("img", tokenInfo.img())
+            .claim("name", tokenInfo.name())
+            .claim("rank", tokenInfo.rank())
             .expiration(new Date(System.currentTimeMillis() + 3600000))
             .signWith(publicKey)
             .compact();

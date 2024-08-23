@@ -14,5 +14,6 @@ public interface GroupAccountMemberRepository extends JpaRepository<GroupAccount
     List<GroupAccountMember> findByAccountAndStatusIsTrue(Account account);
     Optional<GroupAccountMember> findByInviteCodeAndAccountAndStatusIsTrue(String inviteCode, Account account);
     List<GroupAccountMember> findByUserAndStatus(User user, Boolean status);
+    Optional<GroupAccountMember> findByUserAndAccountAndStatusFalse(User user, Account account);
     Optional<GroupAccountMember> findByUserAndAccount(User user, Account account);
 }

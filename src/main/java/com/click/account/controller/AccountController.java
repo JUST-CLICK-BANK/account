@@ -33,11 +33,11 @@ public class AccountController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public void saveAccount(
+    public String saveAccount(
         TokenInfo tokenInfo,
         @RequestBody AccountRequest req
     ) {
-        accountService.saveAccount(tokenInfo, req);
+        return accountService.saveAccount(tokenInfo, req);
     }
 
     @GetMapping("user-account")
@@ -48,7 +48,7 @@ public class AccountController {
     }
 
     // 상대 계좌 정보 가져오기
-    @GetMapping("/others")
+    @GetMapping("/info")
     public AccountUserInfo getAccountUserInfo(
         TokenInfo tokenInfo,
         @RequestParam("account") String account
@@ -104,8 +104,7 @@ public class AccountController {
         TokenInfo tokenInfo,
         @RequestBody AccountMoneyRequest req
     ) {
-        System.out.println(req.toString());
-        accountService.updateMoney(UUID.fromString(tokenInfo.id()), req);
+        accountService.updateMoney(tokenInfo, req);
     }
 
     @PutMapping("/limit")

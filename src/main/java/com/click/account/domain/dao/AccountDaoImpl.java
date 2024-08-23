@@ -33,7 +33,7 @@ public class AccountDaoImpl implements AccountDao {
 
     @Override
     public List<Account> getAccountFromType(UUID userId, Integer type) {
-        return accountRepository.findAccountToType(userId, type);
+        return accountRepository.findAccountToType(userId, type, true);
     }
 
     @Override

@@ -19,7 +19,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     @Query("SELECT a FROM Account a JOIN FETCH a.user u WHERE u.userId = :userId AND a.account = :account")
     Optional<Account> findUserIdAndAccount(@Param("userId") UUID userId, @Param("account") String account);
 
-    @Query("SELECT a FROM Account a WHERE a.user.userId = :userId AND a.type = :type")
-    List<Account> findAccountToType(@Param("userId") UUID userId, @Param("type") Integer type);
+    @Query("SELECT a FROM Account a WHERE a.user.userId = :userId AND a.type = :type AND a.accountAble = :able")
+    List<Account> findAccountToType(@Param("userId") UUID userId, @Param("type") Integer type, @Param("able") Boolean able);
 }
 

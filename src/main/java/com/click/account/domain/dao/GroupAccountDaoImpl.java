@@ -64,6 +64,12 @@ public class GroupAccountDaoImpl implements GroupAccountDao{
 
     @Override
     public GroupAccountMember getGroupAccountMemberStatusIsFalse(User user, Account account) {
+        return groupAccountMemberRepository.findByUserAndAccountAndStatusFalse(user, account)
+            .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public GroupAccountMember getGroupAccountMemberInfo(User user, Account account) {
         return groupAccountMemberRepository.findByUserAndAccount(user, account)
             .orElseThrow(IllegalArgumentException::new);
     }

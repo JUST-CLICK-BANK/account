@@ -20,13 +20,14 @@ public record FriendResponse(
         );
     }
 
-    public static Friend friend(FriendResponse friendResponse) {
+    public static Friend friend(FriendResponse friendResponse, String account) {
         return Friend.builder()
             .friendId(friendResponse.id())
             .friendCode(friendResponse.code())
             .friendImg(friendResponse.img())
             .friendName(friendResponse.name())
             .friendRank(friendResponse.rank())
+            .account(account)
             .build();
     }
 }

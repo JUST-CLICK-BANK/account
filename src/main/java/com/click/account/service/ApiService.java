@@ -6,8 +6,8 @@ import com.click.account.domain.entity.Friend;
 import java.util.List;
 
 public interface ApiService {
-    void sendDeposit(AccountMoneyRequest req, Account account);
-    void sendWithdraw(AccountMoneyRequest req, Account account);
+    void sendDeposit(AccountMoneyRequest req, Account account, String nickname);
+    void sendWithdraw(AccountMoneyRequest req, Account account, String nickname);
     List<Friend> getFriendsInfo(String userCode, String account);
     void sendAccount(String token, Account account);
 }
