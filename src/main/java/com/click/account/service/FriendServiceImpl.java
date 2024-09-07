@@ -21,6 +21,7 @@ public class FriendServiceImpl implements FriendService {
     public List<FriendResponse> getFriends(TokenInfo tokenInfo, String account) {
         List<Friend> friends = apiService.getFriendsInfo(tokenInfo.code(), account);
         if (friends.isEmpty()) throw new IllegalArgumentException();
+
         friendRepository.saveAll(friends);
 
         return friends.stream().map(FriendResponse::from).toList();

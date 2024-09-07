@@ -6,6 +6,7 @@ import com.click.account.config.exception.LimitTransferException;
 import com.click.account.config.exception.NotExistAccountException;
 import com.click.account.config.utils.account.GenerateAccount;
 import com.click.account.config.utils.account.GroupCode;
+import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dao.GroupAccountDao;
@@ -16,6 +17,7 @@ import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
 import com.click.account.domain.dto.response.AccountAmountResponse;
 import com.click.account.domain.dto.response.AccountDetailResponse;
+import com.click.account.domain.dto.response.AccountInfoResponse;
 import com.click.account.domain.dto.response.AccountResponse;
 import com.click.account.domain.dto.response.UserAccountResponse;
 import com.click.account.domain.dto.response.AccountUserInfo;
@@ -43,9 +45,10 @@ public class AccountServiceImpl implements AccountService {
     private final UserService userService;
     private final TransferService transferService;
     private final SavingAccountService savingAccountService;
+    private final JwtUtils jwtUtils;
 
     @Override
-    public void saveAccount(TokenInfo tokenInfo, AccountRequest req) {
+    public String saveAccount(TokenInfo tokenInfo, AccountRequest req) {
         User user = userService.getUser(tokenInfo);
         Integer type = AccountType.fromString(req.accountStatus());
 
@@ -62,6 +65,7 @@ public class AccountServiceImpl implements AccountService {
                 type
             );
             accountDao.saveAccount(account);
+            return account.getAccount();
         }
         // 모임 통장 계좌 생성
         else if (type == 2) {
@@ -69,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
                 makeAccount,
                 user.getUserNickName()+"의 모임 통장",
                 user,
-                GroupCode.getGroupCode(),
+                user.getUserCode(),
                 true,
                 type
             );
@@ -89,6 +93,7 @@ public class AccountServiceImpl implements AccountService {
             transferService.save(req.transferRequest(), makeAccount);
             accountDao.saveAccount(account);
         }
+        return "";
     }
 
     private String makeAccount() {
@@ -105,6 +110,12 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountDao.getAccount(reqAccount);
         if (account == null) throw new IllegalArgumentException();
         return AccountAmountResponse.from(account);
+    }
+
+    @Override
+    public AccountInfoResponse getAccountInfoToCard(String reqAccount) {
+        Account account = accountDao.getAccount(reqAccount);
+        return AccountInfoResponse.from(account);
     }
 
     @Override
@@ -132,6 +143,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountDao.getAccount(reqAccount);
 
         List<UserResponse> userResponses = account.getGroupAccountMembers().stream()
+            .filter(GroupAccountMember::isStatus)
             .map(GroupAccountMember::getUser)
             .distinct()
             .map(user -> UserResponse.from(user.getUserNickName(), user.getUserPorfileImg(), user.getUserCode()))
@@ -168,13 +180,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void updateMoney(UUID userId, AccountMoneyRequest req) {
+    public void updateMoney(TokenInfo tokenInfo, AccountMoneyRequest req) {
         Account account = accountDao.getAccount(req.account());
         // 입금 받은 경우
         if (req.accountStatus().equals("deposit")) {
             Long money = account.getMoneyAmount() + req.moneyAmount();
             account.updateMoney(money);
-            apiService.sendDeposit(req, account);
+            apiService.sendDeposit(req, account, tokenInfo.name());
         }
 
         // 출금한 경우
@@ -182,11 +194,11 @@ public class AccountServiceImpl implements AccountService {
             if (account.getMoneyAmount() <= 0) throw new InsufficientAmountException(req.moneyAmount());
           
             // 일회 한도를 넘었을 경우 에러
-            if (req.moneyAmount() >= account.getAccountOneTimeLimit()) throw new LimitTransferException(
+            if (req.moneyAmount() > account.getAccountOneTimeLimit()) throw new LimitTransferException(
                 account.getAccountOneTimeLimit());
             long money = account.getMoneyAmount()  - req.moneyAmount();
             account.updateMoney(money);
-            apiService.sendWithdraw(req, account);
+            apiService.sendWithdraw(req, account, req.nickname());
         }
     }
 
@@ -199,16 +211,27 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public void deleteAccount(UUID userId, String reqAccount) {
-        log.info(String.valueOf(userId));
+    public void deleteAccount(TokenInfo tokenInfo, String reqAccount) {
+        log.info(String.valueOf(tokenInfo.id()));
         log.info(reqAccount);
-        Account account = accountRepository.findUserIdAndAccount(userId, reqAccount)
+        String token = "Bearer " + jwtUtils.createToken(tokenInfo);
+        Account account = accountRepository.findUserIdAndAccount(
+            UUID.fromString(tokenInfo.id()),
+                reqAccount)
             .orElseThrow(NotExistAccountException::new);
+
+        List<GroupAccountMember> groupAccountMembers = groupAccountDao.getGroupAccountMember(account);
+
+        if(!groupAccountMembers.isEmpty())
+            groupAccountMembers.forEach(groupAccountDao::deleteGroupMember);
         if (account.getType() == 3) {
             savingAccountService.delete(account);
         }
+        if (account.getMoneyAmount() != 0)
+            throw new IllegalArgumentException("돈이 있습니다.");
         account.setAccountAble(false);
         accountRepository.save(account);
+        apiService.sendAccount(token, account);
     }
 }
 

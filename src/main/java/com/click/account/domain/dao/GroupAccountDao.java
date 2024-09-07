@@ -13,6 +13,7 @@ public interface GroupAccountDao {
     List<GroupAccountMember> getGroupAccountMemberFromUser(User user);
     GroupAccountMember getGroupAccountMemberFromStatusIsTrue(String groupCode, Account account);
     GroupAccountMember getGroupAccountMemberStatusIsFalse(User user, Account account);
+    GroupAccountMember getGroupAccountMemberInfo(User user, Account account);
     long getGroupAccountStatusIsTrue(Account account);
     void deleteGroupMember(GroupAccountMember groupAccountMember);
 }

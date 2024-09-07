@@ -1,6 +1,7 @@
 package com.click.account.service;
 
 import com.click.account.config.apis.ApiAccountHistory;
+import com.click.account.config.apis.ApiCard;
 import com.click.account.config.apis.ApiFriendship;
 import com.click.account.domain.dto.request.account.AccountMoneyRequest;
 import com.click.account.domain.dto.request.account.DepositRequest;
@@ -20,18 +21,19 @@ import org.springframework.stereotype.Service;
 public class ApiServiceImpl implements ApiService {
     private final ApiAccountHistory apiAccountHistory;
     private final ApiFriendship apiFriendship;
+    private final ApiCard apiCard;
 
     @Override
-    public void sendDeposit(AccountMoneyRequest req, Account account) {
+    public void sendDeposit(AccountMoneyRequest req, Account account, String nickname) {
         log.info(req.moneyAmount().toString());
-        DepositRequest depositRequest = DepositRequest.toTranfer(req, account.getAccountName(), account.getMoneyAmount());
+        DepositRequest depositRequest = DepositRequest.toTranfer(req, nickname, account.getMoneyAmount());
         apiAccountHistory.sendDepositInfo(depositRequest);
     }
 
     @Override
-    public void sendWithdraw(AccountMoneyRequest req, Account account) {
+    public void sendWithdraw(AccountMoneyRequest req, Account account, String nickname) {
         log.info(req.moneyAmount().toString());
-        WithdrawRequest withdrawRequest = WithdrawRequest.toTransfer(req, account.getAccountName(), account.getMoneyAmount());
+        WithdrawRequest withdrawRequest = WithdrawRequest.toTransfer(req, nickname, account.getMoneyAmount());
         apiAccountHistory.sendWithdrawInfo(withdrawRequest);
     }
 
@@ -39,6 +41,13 @@ public class ApiServiceImpl implements ApiService {
     public List<Friend> getFriendsInfo(String userCode, String account) {
         List<FriendResponse> friendResponses = apiFriendship.inviteFriend(userCode);
 
-        return friendResponses.stream().map(FriendResponse::friend).toList();
+        return friendResponses.stream()
+            .map(friendResponse -> FriendResponse.friend(friendResponse, account))
+            .toList();
+    }
+
+    @Override
+    public void sendAccount(String token, Account account) {
+        apiCard.deleteCard(token, account.getAccount());
     }
 }
