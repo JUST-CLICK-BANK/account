@@ -34,7 +34,6 @@ public record AccountRequest(
             String account,
             String accountName,
             User user,
-            String groupAccountCode,
             Boolean accountAble,
             Integer type
     ) {
@@ -46,7 +45,6 @@ public record AccountRequest(
                 .accountDailyLimit(1000000L)
                 .accountOneTimeLimit(1000000L)
                 .accountAble(accountAble)
-                .groupAccountCode(groupAccountCode)
                 .type(type)
                 .build();
     }

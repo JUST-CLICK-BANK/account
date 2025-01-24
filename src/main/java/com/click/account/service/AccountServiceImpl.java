@@ -5,7 +5,6 @@ import com.click.account.config.exception.InsufficientAmountException;
 import com.click.account.config.exception.LimitTransferException;
 import com.click.account.config.exception.NotExistAccountException;
 import com.click.account.config.utils.account.GenerateAccount;
-import com.click.account.config.utils.account.GroupCode;
 import com.click.account.config.utils.jwt.JwtUtils;
 import com.click.account.config.utils.jwt.TokenInfo;
 import com.click.account.domain.dao.AccountDao;
@@ -15,23 +14,23 @@ import com.click.account.domain.dto.request.account.AccountNameRequest;
 import com.click.account.domain.dto.request.account.AccountPasswordRequest;
 import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.dto.request.account.AccountTransferLimitRequest;
-import com.click.account.domain.dto.response.AccountAmountResponse;
-import com.click.account.domain.dto.response.AccountDetailResponse;
-import com.click.account.domain.dto.response.AccountInfoResponse;
-import com.click.account.domain.dto.response.AccountResponse;
-import com.click.account.domain.dto.response.UserAccountResponse;
-import com.click.account.domain.dto.response.AccountUserInfo;
-import com.click.account.domain.dto.response.UserResponse;
+import com.click.account.domain.dto.response.*;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.GroupAccountMember;
 import com.click.account.domain.entity.User;
 import com.click.account.domain.repository.AccountRepository;
+import com.click.account.service.creator.AccountCreator;
+import com.click.account.service.creator.AccountCreatorImpl;
+import com.click.account.service.creator.GroupAccountCreatorImpl;
+import com.click.account.service.creator.SavingAccountCreatorImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -47,53 +46,43 @@ public class AccountServiceImpl implements AccountService {
     private final SavingAccountService savingAccountService;
     private final JwtUtils jwtUtils;
 
+    /**
+     * 1: 일반 계좌
+     * 2: 모임 계좌
+     * 3: 적금 계좌
+    **/
     @Override
     public String saveAccount(TokenInfo tokenInfo, AccountRequest req) {
+        Map<Integer, AccountCreator> accountCreatorMap = new HashMap<>();
+        accountCreatorMap.put(
+                AccountType.ACCOUNT.getAccountType(),
+                new AccountCreatorImpl(
+                        accountDao
+                )
+        );
+        accountCreatorMap.put(
+                AccountType.GROUP.getAccountType(),
+                new GroupAccountCreatorImpl(
+                        accountDao,
+                        groupAccountDao
+                )
+        );
+        accountCreatorMap.put(
+                AccountType.SAVING.getAccountType(),
+                new SavingAccountCreatorImpl(
+                        accountDao,
+                        savingAccountService,
+                        transferService
+                )
+        );
         User user = userService.getUser(tokenInfo);
         Integer type = AccountType.fromString(req.accountStatus());
 
         // 중복된 계좌가 있는지 확인 후 새로운 계좌 생성
         String makeAccount = makeAccount();
 
-        // 일반 계좌 생성
-        if (type == 1) {
-            Account account = req.toEntity(
-                makeAccount,
-                user.getUserNickName()+"의 통장",
-                user,
-                true,
-                type
-            );
-            accountDao.saveAccount(account);
-            return account.getAccount();
-        }
-        // 모임 통장 계좌 생성
-        else if (type == 2) {
-            Account account = req.toGroupEntity(
-                makeAccount,
-                user.getUserNickName()+"의 모임 통장",
-                user,
-                user.getUserCode(),
-                true,
-                type
-            );
-            accountDao.saveAccount(account);
-            groupAccountDao.saveGroupToUser(user, account);
-       }
-        // 적금 계좌 생성
-        else if (type == 3) {
-            Account account = req.toSavingEntity(
-                makeAccount,
-                user.getUserNickName()+"적금 통장",
-                user,
-                true,
-                type
-            );
-            savingAccountService.save(req.savingRequest(), makeAccount);
-            transferService.save(req.transferRequest(), makeAccount);
-            accountDao.saveAccount(account);
-        }
-        return "";
+        AccountCreator accountCreator = accountCreatorMap.get(type);
+        return accountCreator.createAccount(req, user, makeAccount, type);
     }
 
     private String makeAccount() {

@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface AccountRepository extends JpaRepository<Account, String> {
 
+    Boolean existsByAccount(String account);
+
     Optional<Account> findByAccount(String account);
 
     @Query("SELECT distinct a FROM Account a JOIN a.user u LEFT JOIN a.groupAccountMembers gam WHERE (u.userId = :userId OR gam.user.userId = :userId) AND a.accountAble = :accountAble")

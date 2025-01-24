@@ -1,5 +1,8 @@
 package com.click.account.config.constants;
 
+import lombok.Getter;
+
+@Getter
 public enum AccountType {
     ACCOUNT(1),
     GROUP(2),
@@ -9,10 +12,6 @@ public enum AccountType {
 
     AccountType(Integer accountType) {
         this.accountType = accountType;
-    }
-
-    public Integer getAccountType() {
-        return accountType;
     }
 
     public static Integer fromString(String value) {
