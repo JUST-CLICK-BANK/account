@@ -15,8 +15,7 @@ public class AccountDaoImpl implements AccountDao {
 
     @Override
     public boolean compareAccount(String generatedAccount) {
-        return accountRepository.findByAccount(generatedAccount)
-            .isPresent();
+        return accountRepository.existsByAccount(generatedAccount);
     }
 
     // 추후 saveAccount와 saveGroupAccount 로직 합칠 예정
