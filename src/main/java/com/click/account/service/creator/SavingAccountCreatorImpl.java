@@ -1,6 +1,5 @@
 package com.click.account.service.creator;
 
-import com.click.account.domain.dao.AccountDao;
 import com.click.account.domain.dto.request.account.AccountRequest;
 import com.click.account.domain.entity.Account;
 import com.click.account.domain.entity.User;
@@ -10,22 +9,24 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class SavingAccountCreatorImpl implements AccountCreator{
-    private final AccountDao accountDao;
     private final SavingAccountService savingAccountService;
     private final TransferService transferService;
 
     @Override
-    public String createAccount(AccountRequest req, User user, String makeAccount, Integer type) {
-        Account account = req.toSavingEntity(
+    public Account createAccount(AccountRequest req, User user, String makeAccount, Integer type) {
+
+        return req.toSavingEntity(
                 makeAccount,
                 user.getUserNickName() + "적금 통장",
                 user,
                 true,
                 type
         );
-        accountDao.saveAccount(account);
-        savingAccountService.save(req.savingRequest(), makeAccount);
-        transferService.save(req.transferRequest(), makeAccount);
-        return "";
+    }
+
+    @Override
+    public void afterSaveAccount(Account account, AccountRequest req) {
+        savingAccountService.save(req.savingRequest(), account.getAccount());
+        transferService.save(req.transferRequest(), account.getAccount());
     }
 }

@@ -1,6 +1,6 @@
 package com.click.account.service;
 
-import com.click.account.config.constants.AccountType;
+import  com.click.account.config.constants.AccountType;
 import com.click.account.config.exception.InsufficientAmountException;
 import com.click.account.config.exception.LimitTransferException;
 import com.click.account.config.exception.NotExistAccountException;
@@ -56,24 +56,15 @@ public class AccountServiceImpl implements AccountService {
         Map<Integer, AccountCreator> accountCreatorMap = new HashMap<>();
         accountCreatorMap.put(
                 AccountType.ACCOUNT.getAccountType(),
-                new AccountCreatorImpl(
-                        accountDao
-                )
+                new AccountCreatorImpl()
         );
         accountCreatorMap.put(
                 AccountType.GROUP.getAccountType(),
-                new GroupAccountCreatorImpl(
-                        accountDao,
-                        groupAccountDao
-                )
+                new GroupAccountCreatorImpl(groupAccountDao)
         );
         accountCreatorMap.put(
                 AccountType.SAVING.getAccountType(),
-                new SavingAccountCreatorImpl(
-                        accountDao,
-                        savingAccountService,
-                        transferService
-                )
+                new SavingAccountCreatorImpl(savingAccountService, transferService)
         );
         User user = userService.getUser(tokenInfo);
         Integer type = AccountType.fromString(req.accountStatus());
@@ -82,7 +73,12 @@ public class AccountServiceImpl implements AccountService {
         String makeAccount = makeAccount();
 
         AccountCreator accountCreator = accountCreatorMap.get(type);
-        return accountCreator.createAccount(req, user, makeAccount, type);
+        Account account = accountCreator.createAccount(req, user, makeAccount, type);
+
+        accountDao.saveAccount(account);
+        accountCreator.afterSaveAccount(account, req);
+
+        return account.getAccount();
     }
 
     private String makeAccount() {

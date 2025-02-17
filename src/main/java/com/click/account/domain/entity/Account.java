@@ -78,7 +78,7 @@ public class Account {
             .accountPassword(accountPassword)
             .groupAccountCode(groupAccountCode)
             .groupAccountMembers(groupAccountMembers)
-            .accountDisable(accountDisable)
+            .accountAble(accountAble)
             .accountOneTimeLimit(accountOneTimeLimit)
             .build();
     }
